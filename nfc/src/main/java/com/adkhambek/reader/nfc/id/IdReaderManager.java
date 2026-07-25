@@ -14,10 +14,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.adkhambek.reader.nfc.tech.Hex;
+import com.adkhambek.reader.iso7816.Hex;
 import com.adkhambek.reader.common.Result;
 import com.adkhambek.reader.common.WorkerThread;
-import com.adkhambek.reader.nfc.tech.Iso7816;
+import com.adkhambek.reader.iso7816.Iso7816;
+import com.adkhambek.reader.iso7816.IsoDepChannel;
 import com.adkhambek.reader.nfc.id.bac.Bac;
 import com.adkhambek.reader.nfc.id.bac.SecureMessaging;
 import com.adkhambek.reader.common.mrz.IdCard;
@@ -98,7 +99,7 @@ public final class IdReaderManager {
 		final IsoDep iso = IsoDep.get(tag);
 		if (iso == null) return Result.err(new IllegalStateException("Card is not ISO-DEP"));
 
-		final Iso7816.StdTag std = new Iso7816.StdTag(iso);
+		final Iso7816.StdTag std = new Iso7816.StdTag(new IsoDepChannel(iso));
 		final IdCard.Builder card = new IdCard.Builder();
 
 		try {

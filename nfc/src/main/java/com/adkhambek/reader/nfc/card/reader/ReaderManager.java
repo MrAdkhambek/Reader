@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.adkhambek.reader.nfc.card.bean.Card;
 import com.adkhambek.reader.nfc.card.bean.CardApp;
-import com.adkhambek.reader.nfc.tech.Hex;
+import com.adkhambek.reader.iso7816.Hex;
 import com.adkhambek.reader.common.Result;
 import com.adkhambek.reader.common.WorkerThread;
 

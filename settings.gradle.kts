@@ -18,6 +18,7 @@ rootProject.name = "Read3r"
 include(
     ":app",
     ":common",
+    ":iso7816",
     ":nfc",
     ":qr",
 )

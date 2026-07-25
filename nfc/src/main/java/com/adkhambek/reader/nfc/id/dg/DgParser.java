@@ -4,10 +4,10 @@ package com.adkhambek.reader.nfc.id.dg;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.adkhambek.reader.nfc.tech.Hex;
+import com.adkhambek.reader.iso7816.Hex;
 import com.adkhambek.reader.common.mrz.IdCard;
 import com.adkhambek.reader.common.mrz.Mrz;
-import com.adkhambek.reader.nfc.tech.Iso7816;
+import com.adkhambek.reader.iso7816.Iso7816;
 
 /**
  * Parsers for EF.COM (DG list) and the DGs we support — DG1, DG11, DG12, DG13.

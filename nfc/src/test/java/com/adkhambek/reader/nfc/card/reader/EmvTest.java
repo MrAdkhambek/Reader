@@ -6,9 +6,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import com.adkhambek.reader.nfc.card.Currency;
-import com.adkhambek.reader.nfc.tech.Iso7816.BerHouse;
-import com.adkhambek.reader.nfc.tech.Iso7816.BerTLV;
-import com.adkhambek.reader.nfc.tech.Iso7816.BerV;
+import com.adkhambek.reader.iso7816.Iso7816.BerHouse;
+import com.adkhambek.reader.iso7816.Iso7816.BerTLV;
+import com.adkhambek.reader.iso7816.Iso7816.BerV;
 
 import org.junit.Test;
 

@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.nfc.tech;
+package com.adkhambek.reader.iso7816;
 
 /**
  * Byte / hex / packed-block helpers shared by the bank-card and ID-card readers.
@@ -89,6 +89,23 @@ public final class Hex {
 		}
 		final byte[] out = new byte[i];
 		System.arraycopy(data, 0, out, 0, i);
+		return out;
+	}
+
+	/** Inverse of {@link #encode(byte[])}. Whitespace is ignored. */
+	public static byte[] decode(String hex) {
+		final StringBuilder clean = new StringBuilder(hex.length());
+		for (int i = 0; i < hex.length(); ++i) {
+			final char c = hex.charAt(i);
+			if (c != ' ' && c != '\n' && c != '\t') clean.append(c);
+		}
+		if ((clean.length() & 1) != 0) {
+			throw new IllegalArgumentException("odd-length hex: " + clean.length());
+		}
+		final byte[] out = new byte[clean.length() / 2];
+		for (int i = 0; i < out.length; ++i) {
+			out[i] = (byte) Integer.parseInt(clean.substring(i * 2, i * 2 + 2), 16);
+		}
 		return out;
 	}
 }

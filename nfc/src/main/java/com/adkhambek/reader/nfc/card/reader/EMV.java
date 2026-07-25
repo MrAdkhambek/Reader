@@ -12,11 +12,12 @@ import java.util.List;
 
 import com.adkhambek.reader.nfc.card.Currency;
 import com.adkhambek.reader.nfc.card.bean.CardApp;
-import com.adkhambek.reader.nfc.tech.Hex;
-import com.adkhambek.reader.nfc.tech.Iso7816;
-import com.adkhambek.reader.nfc.tech.Iso7816.BerHouse;
-import com.adkhambek.reader.nfc.tech.Iso7816.BerT;
-import com.adkhambek.reader.nfc.tech.Iso7816.BerTLV;
+import com.adkhambek.reader.iso7816.Hex;
+import com.adkhambek.reader.iso7816.Iso7816;
+import com.adkhambek.reader.iso7816.Iso7816.BerHouse;
+import com.adkhambek.reader.iso7816.Iso7816.BerT;
+import com.adkhambek.reader.iso7816.Iso7816.BerTLV;
+import com.adkhambek.reader.iso7816.IsoDepChannel;
 
 public final class EMV {
 	private static final String TAG = "NFCard";
@@ -25,9 +26,8 @@ public final class EMV {
 
 	public static List<CardApp> readCard(IsoDep tech) throws IOException {
 		final List<CardApp> apps = new ArrayList<>();
-		final Iso7816.StdTag tag = new Iso7816.StdTag(tech);
-		final boolean alreadyConnected = tech.isConnected();
-		if (!alreadyConnected) tag.connect();
+		final Iso7816.StdTag tag = new Iso7816.StdTag(new IsoDepChannel(tech));
+		tag.connect();
 
 		try {
 			Log.i(TAG, "EMV: SELECT PPSE");
@@ -46,7 +46,7 @@ public final class EMV {
 				if (app != null) apps.add(app);
 			}
 		} finally {
-			if (!alreadyConnected) tag.close();
+			tag.close();
 		}
 		return apps;
 	}

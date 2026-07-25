@@ -4,9 +4,9 @@ package com.adkhambek.reader.nfc.id.bac;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import com.adkhambek.reader.nfc.tech.Hex;
-import com.adkhambek.reader.nfc.tech.Iso7816;
-import com.adkhambek.reader.nfc.tech.Iso7816.BerTLV;
+import com.adkhambek.reader.iso7816.Hex;
+import com.adkhambek.reader.iso7816.Iso7816;
+import com.adkhambek.reader.iso7816.Iso7816.BerTLV;
 
 /**
  * ICAO 9303 Secure Messaging over 3DES/MAC. Wraps and unwraps plain APDUs

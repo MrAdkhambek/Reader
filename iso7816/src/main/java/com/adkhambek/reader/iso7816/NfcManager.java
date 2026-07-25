@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.nfc.common;
+package com.adkhambek.reader.iso7816;
 
 import static android.nfc.NfcAdapter.EXTRA_TAG;
 

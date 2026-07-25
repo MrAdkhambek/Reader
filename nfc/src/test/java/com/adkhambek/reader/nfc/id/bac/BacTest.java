@@ -4,7 +4,7 @@ package com.adkhambek.reader.nfc.id.bac;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-import com.adkhambek.reader.nfc.tech.Hex;
+import com.adkhambek.reader.iso7816.Hex;
 
 import org.junit.Test;
 

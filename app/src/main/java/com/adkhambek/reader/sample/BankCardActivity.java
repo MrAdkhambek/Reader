@@ -16,7 +16,7 @@ import com.adkhambek.reader.nfc.card.bean.Card;
 import com.adkhambek.reader.nfc.card.bean.CardApp;
 import com.adkhambek.reader.nfc.card.reader.ReaderListener;
 import com.adkhambek.reader.nfc.card.reader.ReaderManager;
-import com.adkhambek.reader.nfc.common.NfcManager;
+import com.adkhambek.reader.iso7816.NfcManager;
 
 public final class BankCardActivity extends Activity implements ReaderListener {
 

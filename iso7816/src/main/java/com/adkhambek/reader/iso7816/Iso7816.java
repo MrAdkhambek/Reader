@@ -1,7 +1,6 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.nfc.tech;
+package com.adkhambek.reader.iso7816;
 
-import android.nfc.tech.IsoDep;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
@@ -296,26 +295,22 @@ public class Iso7816 {
 		private static final byte CH_STA_LE = (byte) 0x6C;
 		private static final byte[] CMD_GETRESPONSE = {0x00, (byte) 0xC0, 0x00, 0x00, 0x00};
 
-		private final IsoDep iso;
+		private final ApduChannel channel;
 
-		public StdTag(IsoDep iso) {
-			this.iso = iso;
+		public StdTag(ApduChannel channel) {
+			this.channel = channel;
 		}
 
 		public void connect() throws IOException {
-			iso.connect();
+			channel.connect();
 		}
 
 		public void close() throws IOException {
-			iso.close();
+			channel.close();
 		}
 
 		public void setTimeout(int ms) {
-			iso.setTimeout(ms);
-		}
-
-		public boolean isConnected() {
-			return iso.isConnected();
+			channel.setTimeout(ms);
 		}
 
 		public Response transceive(byte[] cmd) throws IOException {
@@ -326,7 +321,7 @@ public class Iso7816 {
 				if (++exchanges > 16) {
 					throw new IOException("Too many chained APDU responses");
 				}
-				final byte[] r = iso.transceive(c);
+				final byte[] r = channel.transceive(c);
 				if (r == null) {
 					Log.w("NFCard", "<< null response");
 					return new Response(Response.ERROR);

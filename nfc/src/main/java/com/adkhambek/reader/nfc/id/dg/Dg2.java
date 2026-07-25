@@ -2,7 +2,7 @@
 package com.adkhambek.reader.nfc.id.dg;
 
 import com.adkhambek.reader.common.mrz.PhotoFormat;
-import com.adkhambek.reader.nfc.tech.Iso7816;
+import com.adkhambek.reader.iso7816.Iso7816;
 
 /**
  * DG2 (ICAO 9303) — facial biometric. The actual image lives inside a

@@ -23,7 +23,7 @@ import java.util.Map;
 
 import com.adkhambek.reader.common.Result;
 import com.adkhambek.reader.common.mrz.IdCard;
-import com.adkhambek.reader.nfc.common.NfcManager;
+import com.adkhambek.reader.iso7816.NfcManager;
 import com.adkhambek.reader.nfc.id.IdReaderListener;
 import com.adkhambek.reader.nfc.id.IdReaderManager;
 import com.adkhambek.reader.nfc.id.MrzKey;
