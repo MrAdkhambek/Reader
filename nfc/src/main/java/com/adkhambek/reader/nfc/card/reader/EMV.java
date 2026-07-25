@@ -10,13 +10,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.adkhambek.reader.nfc.card.SPEC;
+import com.adkhambek.reader.nfc.card.Currency;
 import com.adkhambek.reader.nfc.card.bean.CardApp;
-import com.adkhambek.reader.common.Hex;
-import com.adkhambek.reader.common.tech.Iso7816;
-import com.adkhambek.reader.common.tech.Iso7816.BerHouse;
-import com.adkhambek.reader.common.tech.Iso7816.BerT;
-import com.adkhambek.reader.common.tech.Iso7816.BerTLV;
+import com.adkhambek.reader.nfc.tech.Hex;
+import com.adkhambek.reader.nfc.tech.Iso7816;
+import com.adkhambek.reader.nfc.tech.Iso7816.BerHouse;
+import com.adkhambek.reader.nfc.tech.Iso7816.BerT;
+import com.adkhambek.reader.nfc.tech.Iso7816.BerTLV;
 
 public final class EMV {
 	private static final String TAG = "NFCard";
@@ -115,7 +115,7 @@ public final class EMV {
 		final String panSeq = hex2Digits(all, (short) 0x5F34);
 		final String holder = string(all, (short) 0x5F20);
 		final String ctry = country(all);
-		final SPEC.CUR cur = currency(all);
+		final Currency cur = currency(all);
 		final String expiry = extractExpiry(all);
 		final String effective = ymFromBcd(all, (short) 0x5F25);
 		final String appVer = hexBytes(all, (short) 0x9F08);
@@ -264,48 +264,48 @@ public final class EMV {
 		return sb.length() == 0 ? null : sb.toString();
 	}
 
-	static SPEC.CUR currency(BerHouse all) {
+	static Currency currency(BerHouse all) {
 		BerTLV t = all.findFirst((short) 0x9F42);
 		if (t == null) t = all.findFirst((short) 0x5F2A);
 		if (t == null || t.v.size() < 2) return null;
 		final byte[] b = t.v.getBytes();
 		final int code = ((b[0] & 0xFF) << 8) | (b[1] & 0xFF);
 		switch (code) {
-			case 0x0840: return SPEC.CUR.USD;
-			case 0x0978: return SPEC.CUR.EUR;
-			case 0x0826: return SPEC.CUR.GBP;
-			case 0x0392: return SPEC.CUR.JPY;
-			case 0x0756: return SPEC.CUR.CHF;
-			case 0x0124: return SPEC.CUR.CAD;
-			case 0x0036: return SPEC.CUR.AUD;
-			case 0x0554: return SPEC.CUR.NZD;
-			case 0x0156: return SPEC.CUR.CNY;
-			case 0x0344: return SPEC.CUR.HKD;
-			case 0x0901: return SPEC.CUR.TWD;
-			case 0x0410: return SPEC.CUR.KRW;
-			case 0x0702: return SPEC.CUR.SGD;
-			case 0x0356: return SPEC.CUR.INR;
-			case 0x0360: return SPEC.CUR.IDR;
-			case 0x0764: return SPEC.CUR.THB;
-			case 0x0458: return SPEC.CUR.MYR;
-			case 0x0608: return SPEC.CUR.PHP;
-			case 0x0704: return SPEC.CUR.VND;
-			case 0x0643: return SPEC.CUR.RUB;
-			case 0x0949: return SPEC.CUR.TRY;
-			case 0x0784: return SPEC.CUR.AED;
-			case 0x0682: return SPEC.CUR.SAR;
-			case 0x0376: return SPEC.CUR.ILS;
-			case 0x0710: return SPEC.CUR.ZAR;
-			case 0x0986: return SPEC.CUR.BRL;
-			case 0x0484: return SPEC.CUR.MXN;
-			case 0x0860: return SPEC.CUR.UZS;
-			case 0x0398: return SPEC.CUR.KZT;
-			case 0x0417: return SPEC.CUR.KGS;
-			case 0x0944: return SPEC.CUR.AZN;
-			case 0x0981: return SPEC.CUR.GEL;
-			case 0x0051: return SPEC.CUR.AMD;
-			case 0x0933: return SPEC.CUR.BYN;
-			case 0x0980: return SPEC.CUR.UAH;
+			case 0x0840: return Currency.USD;
+			case 0x0978: return Currency.EUR;
+			case 0x0826: return Currency.GBP;
+			case 0x0392: return Currency.JPY;
+			case 0x0756: return Currency.CHF;
+			case 0x0124: return Currency.CAD;
+			case 0x0036: return Currency.AUD;
+			case 0x0554: return Currency.NZD;
+			case 0x0156: return Currency.CNY;
+			case 0x0344: return Currency.HKD;
+			case 0x0901: return Currency.TWD;
+			case 0x0410: return Currency.KRW;
+			case 0x0702: return Currency.SGD;
+			case 0x0356: return Currency.INR;
+			case 0x0360: return Currency.IDR;
+			case 0x0764: return Currency.THB;
+			case 0x0458: return Currency.MYR;
+			case 0x0608: return Currency.PHP;
+			case 0x0704: return Currency.VND;
+			case 0x0643: return Currency.RUB;
+			case 0x0949: return Currency.TRY;
+			case 0x0784: return Currency.AED;
+			case 0x0682: return Currency.SAR;
+			case 0x0376: return Currency.ILS;
+			case 0x0710: return Currency.ZAR;
+			case 0x0986: return Currency.BRL;
+			case 0x0484: return Currency.MXN;
+			case 0x0860: return Currency.UZS;
+			case 0x0398: return Currency.KZT;
+			case 0x0417: return Currency.KGS;
+			case 0x0944: return Currency.AZN;
+			case 0x0981: return Currency.GEL;
+			case 0x0051: return Currency.AMD;
+			case 0x0933: return Currency.BYN;
+			case 0x0980: return Currency.UAH;
 			default: return null;
 		}
 	}

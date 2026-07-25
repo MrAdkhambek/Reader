@@ -100,9 +100,8 @@ public final class QrIdScannerView extends FrameLayout {
 		// always writes those fields), so noise QR codes were being presented
 		// as ID data.
 		if (Mrz.isValidMrz(stripped)) {
-			final IdCard candidate = new IdCard();
-			Mrz.decodeMrz(stripped, candidate);
-			if (candidate.documentNumber != null) {
+			final IdCard candidate = Mrz.decode(stripped);
+			if (candidate.hasMrz()) {
 				mrz = candidate;
 			}
 		}

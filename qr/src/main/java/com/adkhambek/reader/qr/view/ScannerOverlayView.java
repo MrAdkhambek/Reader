@@ -225,51 +225,15 @@ public final class ScannerOverlayView extends View {
 	 */
 	public RectF imageRectToView(int imageWidth, int imageHeight, int rotationDegrees,
 	                             float[] xs, float[] ys) {
-		// Defensive: empty / mismatched / null points → fall back so we don't draw
-		// a Float.MAX_VALUE / -Float.MAX_VALUE box. Can happen with some 1D-style
-		// ZXing results or partially populated test fixtures.
-		if (xs == null || ys == null || xs.length == 0 || xs.length != ys.length) {
-			return new RectF(defaultReticle);
-		}
-		final boolean swap = rotationDegrees == 90 || rotationDegrees == 270;
-		final int effImgW = swap ? imageHeight : imageWidth;
-		final int effImgH = swap ? imageWidth : imageHeight;
-		final float viewW = getWidth();
-		final float viewH = getHeight();
-		if (viewW <= 0 || viewH <= 0 || effImgW <= 0 || effImgH <= 0) {
-			return new RectF(defaultReticle);
-		}
-
-		// FILL_CENTER: scale so the image covers the view, then center the overflow.
-		final float scale = Math.max(viewW / effImgW, viewH / effImgH);
-		final float scaledW = effImgW * scale;
-		final float scaledH = effImgH * scale;
-		final float offsetX = (viewW - scaledW) / 2f;
-		final float offsetY = (viewH - scaledH) / 2f;
-
-		float minX = Float.MAX_VALUE, minY = Float.MAX_VALUE;
-		float maxX = -Float.MAX_VALUE, maxY = -Float.MAX_VALUE;
-		for (int i = 0; i < xs.length; ++i) {
-			final float xi = xs[i];
-			final float yi = ys[i];
-			float rx;
-			float ry;
-			switch (rotationDegrees) {
-				case 90:  rx = imageHeight - yi; ry = xi; break;
-				case 180: rx = imageWidth  - xi; ry = imageHeight - yi; break;
-				case 270: rx = yi;               ry = imageWidth  - xi; break;
-				default:  rx = xi;               ry = yi;
-			}
-			final float vx = rx * scale + offsetX;
-			final float vy = ry * scale + offsetY;
-			if (vx < minX) minX = vx;
-			if (vy < minY) minY = vy;
-			if (vx > maxX) maxX = vx;
-			if (vy > maxY) maxY = vy;
-		}
-
 		// Brackets sit slightly outside the finder patterns to match the QR's true edges.
 		final float pad = 20f * density;
-		return new RectF(minX - pad, minY - pad, maxX + pad, maxY + pad);
+		final float[] b = PreviewGeometry.boundsForPoints(
+				imageWidth, imageHeight, rotationDegrees,
+				getWidth(), getHeight(), pad, xs, ys);
+		// Degenerate input — empty / mismatched / null points, or a view not laid
+		// out yet. Fall back to the centered reticle rather than drawing a
+		// Float.MAX_VALUE box. Happens with some 1D-style ZXing results.
+		if (b == null) return new RectF(defaultReticle);
+		return new RectF(b[0], b[1], b[2], b[3]);
 	}
 }

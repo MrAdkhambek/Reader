@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.common.tech;
+package com.adkhambek.reader.nfc.tech;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -8,12 +8,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import com.adkhambek.reader.common.tech.Iso7816.BerHouse;
-import com.adkhambek.reader.common.tech.Iso7816.BerL;
-import com.adkhambek.reader.common.tech.Iso7816.BerT;
-import com.adkhambek.reader.common.tech.Iso7816.BerTLV;
-import com.adkhambek.reader.common.tech.Iso7816.BerV;
-import com.adkhambek.reader.common.tech.Iso7816.Response;
+import com.adkhambek.reader.nfc.tech.Iso7816.BerHouse;
+import com.adkhambek.reader.nfc.tech.Iso7816.BerL;
+import com.adkhambek.reader.nfc.tech.Iso7816.BerT;
+import com.adkhambek.reader.nfc.tech.Iso7816.BerTLV;
+import com.adkhambek.reader.nfc.tech.Iso7816.BerV;
+import com.adkhambek.reader.nfc.tech.Iso7816.Response;
 
 import org.junit.Test;
 

@@ -5,10 +5,10 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import com.adkhambek.reader.nfc.card.SPEC;
-import com.adkhambek.reader.common.tech.Iso7816.BerHouse;
-import com.adkhambek.reader.common.tech.Iso7816.BerTLV;
-import com.adkhambek.reader.common.tech.Iso7816.BerV;
+import com.adkhambek.reader.nfc.card.Currency;
+import com.adkhambek.reader.nfc.tech.Iso7816.BerHouse;
+import com.adkhambek.reader.nfc.tech.Iso7816.BerTLV;
+import com.adkhambek.reader.nfc.tech.Iso7816.BerV;
 
 import org.junit.Test;
 
@@ -56,15 +56,15 @@ public class EmvTest {
 	// --- currency -----------------------------------------------------------
 
 	@Test public void currency_usd() {
-		assertEquals(SPEC.CUR.USD, EMV.currency(house("9F42 02 08 40")));
+		assertEquals(Currency.USD, EMV.currency(house("9F42 02 08 40")));
 	}
 
 	@Test public void currency_eur() {
-		assertEquals(SPEC.CUR.EUR, EMV.currency(house("9F42 02 09 78")));
+		assertEquals(Currency.EUR, EMV.currency(house("9F42 02 09 78")));
 	}
 
 	@Test public void currency_uzs() {
-		assertEquals(SPEC.CUR.UZS, EMV.currency(house("9F42 02 08 60")));
+		assertEquals(Currency.UZS, EMV.currency(house("9F42 02 08 60")));
 	}
 
 	@Test public void currency_unmappedReturnsNull() {

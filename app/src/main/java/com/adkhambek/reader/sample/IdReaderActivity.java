@@ -1,20 +1,15 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.card;
+package com.adkhambek.reader.sample;
 
 import android.app.Activity;
-import android.app.PendingIntent;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.nfc.NfcAdapter;
 import android.nfc.Tag;
-import android.nfc.tech.IsoDep;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Gravity;
@@ -28,6 +23,7 @@ import java.util.Map;
 
 import com.adkhambek.reader.common.Result;
 import com.adkhambek.reader.common.mrz.IdCard;
+import com.adkhambek.reader.nfc.common.NfcManager;
 import com.adkhambek.reader.nfc.id.IdReaderListener;
 import com.adkhambek.reader.nfc.id.IdReaderManager;
 import com.adkhambek.reader.nfc.id.MrzKey;
@@ -36,8 +32,7 @@ public final class IdReaderActivity extends Activity implements IdReaderListener
 
 	private TextView output;
 	private ImageView photo;
-	private NfcAdapter nfcAdapter;
-	private PendingIntent pi;
+	private NfcManager nfc;
 	private MrzKey key;
 	private boolean destroyed;
 
@@ -69,6 +64,10 @@ public final class IdReaderActivity extends Activity implements IdReaderListener
 		scroll.addView(root);
 		setContentView(scroll);
 
+		// Created before the missing-key bail-out below: onResume/onPause run
+		// either way, and NfcManager no-ops when the device has no NFC adapter.
+		nfc = new NfcManager(this);
+
 		String doc = getIntent().getStringExtra(IdInputActivity.K_DOC);
 		String dob = getIntent().getStringExtra(IdInputActivity.K_DOB);
 		String exp = getIntent().getStringExtra(IdInputActivity.K_EXP);
@@ -83,26 +82,18 @@ public final class IdReaderActivity extends Activity implements IdReaderListener
 			return;
 		}
 		key = new MrzKey(doc, dob, exp);
-		nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-		pi = PendingIntent.getActivity(this, 0,
-				new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
-				PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (nfcAdapter != null) {
-			nfcAdapter.enableForegroundDispatch(this, pi,
-					new IntentFilter[]{new IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED)},
-					new String[][]{{IsoDep.class.getName()}});
-		}
+		nfc.onResume(this);
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		if (nfcAdapter != null) nfcAdapter.disableForegroundDispatch(this);
+		nfc.onPause(this);
 	}
 
 	@Override
@@ -127,14 +118,7 @@ public final class IdReaderActivity extends Activity implements IdReaderListener
 	@Override
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
-		final Tag tag;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-			tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG, Tag.class);
-		} else {
-			@SuppressWarnings("deprecation")
-			final Tag legacy = (Tag) intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-			tag = legacy;
-		}
+		final Tag tag = NfcManager.tagFrom(intent);
 		if (tag != null && key != null) IdReaderManager.readCard(tag, key, this);
 	}
 
@@ -145,7 +129,7 @@ public final class IdReaderActivity extends Activity implements IdReaderListener
 	}
 
 	@Override
-	public void onResult(Result<IdCard, Exception> result) {
+	public void onResult(Result<IdCard, Throwable> result) {
 		if (destroyed || output == null) return;
 		if (result.isErr()) {
 			output.setText(getString(R.string.error_prefix, result.error().getMessage()));
@@ -156,49 +140,49 @@ public final class IdReaderActivity extends Activity implements IdReaderListener
 
 	private void render(IdCard c) {
 		final StringBuilder sb = new StringBuilder();
-		line(sb, "Document type", c.documentType);
-		line(sb, "Issuing country", c.issuingCountry);
-		line(sb, "Document number", c.documentNumber);
-		line(sb, "Last name", c.lastName);
-		line(sb, "First name", c.firstName);
-		line(sb, "Sex", c.sex);
-		line(sb, "Nationality", c.nationality);
-		line(sb, "Date of birth", c.dateOfBirth);
-		line(sb, "Date of expiry", c.dateOfExpiry);
-		line(sb, "Personal number", c.personalNumber);
+		line(sb, "Document type", c.documentType());
+		line(sb, "Issuing country", c.issuingCountry());
+		line(sb, "Document number", c.documentNumber());
+		line(sb, "Last name", c.lastName());
+		line(sb, "First name", c.firstName());
+		line(sb, "Sex", c.sex());
+		line(sb, "Nationality", c.nationality());
+		line(sb, "Date of birth", c.dateOfBirth());
+		line(sb, "Date of expiry", c.dateOfExpiry());
+		line(sb, "Personal number", c.personalNumber());
 
-		if (c.fullName != null) {
+		if (c.fullName() != null) {
 			sb.append("\n-- DG11 --\n");
-			line(sb, "Full name", c.fullName);
-			line(sb, "Other names", c.otherNames);
-			line(sb, "Place of birth", c.placeOfBirth);
-			line(sb, "Full DOB", c.fullDateOfBirth);
-			line(sb, "Address", c.address);
-			line(sb, "Telephone", c.telephone);
-			line(sb, "Profession", c.profession);
-			line(sb, "Title", c.title);
+			line(sb, "Full name", c.fullName());
+			line(sb, "Other names", c.otherNames());
+			line(sb, "Place of birth", c.placeOfBirth());
+			line(sb, "Full DOB", c.fullDateOfBirth());
+			line(sb, "Address", c.address());
+			line(sb, "Telephone", c.telephone());
+			line(sb, "Profession", c.profession());
+			line(sb, "Title", c.title());
 		}
-		if (c.issuingAuthority != null || c.dateOfIssue != null) {
+		if (c.issuingAuthority() != null || c.dateOfIssue() != null) {
 			sb.append("\n-- DG12 --\n");
-			line(sb, "Issuing authority", c.issuingAuthority);
-			line(sb, "Date of issue", c.dateOfIssue);
-			line(sb, "Endorsements", c.endorsements);
+			line(sb, "Issuing authority", c.issuingAuthority());
+			line(sb, "Date of issue", c.dateOfIssue());
+			line(sb, "Endorsements", c.endorsements());
 		}
-		if (c.nationalData != null && !c.nationalData.isEmpty()) {
+		if (!c.nationalData().isEmpty()) {
 			sb.append("\n-- DG13 --\n");
-			for (final Map.Entry<String, String> e : c.nationalData.entrySet()) {
+			for (final Map.Entry<String, String> e : c.nationalData().entrySet()) {
 				line(sb, e.getKey(), e.getValue());
 			}
 		}
-		if (c.presentDataGroups != null) {
+		if (!c.presentDataGroups().isEmpty()) {
 			sb.append("\nPresent: ");
-			for (final String n : c.presentDataGroups) sb.append(n).append(' ');
+			for (final String n : c.presentDataGroups()) sb.append(n).append(' ');
 			sb.append('\n');
 		}
 		output.setText(sb.toString());
 
-		if (c.photoBytes != null) {
-			final Bitmap bmp = decodePhoto(c.photoBytes);
+		if (c.photoBytes() != null) {
+			final Bitmap bmp = decodePhoto(c.photoBytes());
 			if (bmp != null) {
 				final Drawable old = photo.getDrawable();
 				photo.setImageBitmap(bmp);
@@ -212,7 +196,7 @@ public final class IdReaderActivity extends Activity implements IdReaderListener
 			} else {
 				// BitmapFactory can't decode JPEG2000 (the common eMRTD face-image
 				// codec), so the photo would otherwise vanish with no explanation.
-				output.append("\n" + getString(R.string.id_photo_not_displayable, c.photoFormat) + "\n");
+				output.append("\n" + getString(R.string.id_photo_not_displayable, c.photoFormat()) + "\n");
 			}
 		}
 	}

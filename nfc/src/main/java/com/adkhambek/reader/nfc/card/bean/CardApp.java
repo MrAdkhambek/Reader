@@ -3,7 +3,7 @@ package com.adkhambek.reader.nfc.card.bean;
 import java.util.Arrays;
 import java.util.Objects;
 
-import com.adkhambek.reader.nfc.card.SPEC;
+import com.adkhambek.reader.nfc.card.Currency;
 
 public record CardApp(
         byte[] aid,
@@ -12,7 +12,7 @@ public record CardApp(
         String panSequence,
         String cardholder,
         String country,
-        SPEC.CUR currency,
+        Currency currency,
         String effectiveDate,
         String expiryDate,
         String appVersion

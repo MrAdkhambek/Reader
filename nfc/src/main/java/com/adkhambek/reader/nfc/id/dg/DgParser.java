@@ -2,19 +2,30 @@
 package com.adkhambek.reader.nfc.id.dg;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
-import com.adkhambek.reader.common.Hex;
+import com.adkhambek.reader.nfc.tech.Hex;
 import com.adkhambek.reader.common.mrz.IdCard;
-import com.adkhambek.reader.common.tech.Iso7816;
+import com.adkhambek.reader.common.mrz.Mrz;
+import com.adkhambek.reader.nfc.tech.Iso7816;
 
 /**
- * Parsers for EF.COM (DG list) and the textual DGs we support — DG11, DG12, DG13.
- * DG1 lives in {@link Mrz}; DG2 in {@link Dg2}.
+ * Parsers for EF.COM (DG list) and the DGs we support — DG1, DG11, DG12, DG13.
+ * DG2 is handled separately in {@link Dg2}.
  */
 public final class DgParser {
 	private DgParser() {
+	}
+
+	/**
+	 * DG1 — strip the 5F1F TLV wrapper and hand the raw MRZ string to
+	 * {@link Mrz#decodeMrz}. The TLV unwrapping lives here rather than in
+	 * {@code :common} so that module stays free of any APDU dependency.
+	 */
+	public static void parseDg1(byte[] dg1, IdCard.Builder card) {
+		final Iso7816.BerTLV mrzTlv = Iso7816.BerHouse.from(dg1).findFirst(0x5F1F);
+		if (mrzTlv == null) return;
+		Mrz.decodeMrz(new String(mrzTlv.v.getBytes()), card);
 	}
 
 	public static List<String> parseCom(byte[] com) {
@@ -25,35 +36,36 @@ public final class DgParser {
 		return out;
 	}
 
-	public static void parseDg11(byte[] dg11, IdCard card) {
+	public static void parseDg11(byte[] dg11, IdCard.Builder card) {
 		final Iso7816.BerHouse h = Iso7816.BerHouse.from(dg11);
-		card.fullName = textOf(h, 0x5F0E);
-		card.otherNames = textOf(h, 0x5F0F);
-		if (card.personalNumber == null) card.personalNumber = textOf(h, 0x5F10);
-		card.placeOfBirth = textOf(h, 0x5F11);
-		card.fullDateOfBirth = dateOf(h, 0x5F2B);
-		card.address = textOf(h, 0x5F42);
-		card.telephone = textOf(h, 0x5F12);
-		card.profession = textOf(h, 0x5F13);
-		card.title = textOf(h, 0x5F14);
+		card.fullName(textOf(h, 0x5F0E))
+				.otherNames(textOf(h, 0x5F0F))
+				// 5F10 is a fallback for cards that leave the MRZ field blank —
+				// it must not overwrite what DG1 already gave us.
+				.personalNumberIfAbsent(textOf(h, 0x5F10))
+				.placeOfBirth(textOf(h, 0x5F11))
+				.fullDateOfBirth(dateOf(h, 0x5F2B))
+				.address(textOf(h, 0x5F42))
+				.telephone(textOf(h, 0x5F12))
+				.profession(textOf(h, 0x5F13))
+				.title(textOf(h, 0x5F14));
 	}
 
-	public static void parseDg12(byte[] dg12, IdCard card) {
+	public static void parseDg12(byte[] dg12, IdCard.Builder card) {
 		final Iso7816.BerHouse h = Iso7816.BerHouse.from(dg12);
-		card.issuingAuthority = textOf(h, 0x5F19);
-		card.dateOfIssue = dateOf(h, 0x5F26);
-		card.endorsements = textOf(h, 0x5F1B);
+		card.issuingAuthority(textOf(h, 0x5F19))
+				.dateOfIssue(dateOf(h, 0x5F26))
+				.endorsements(textOf(h, 0x5F1B));
 	}
 
-	public static void parseDg13(byte[] dg13, IdCard card) {
-		if (card.nationalData == null) card.nationalData = new LinkedHashMap<>();
+	public static void parseDg13(byte[] dg13, IdCard.Builder card) {
 		final Iso7816.BerHouse h = Iso7816.BerHouse.from(dg13);
 		for (int i = 0; i < h.count(); ++i) {
 			final Iso7816.BerTLV tlv = h.get(i);
 			final byte[] v = tlv.v.getBytes();
 			String text = decodeString(v);
 			if (looksBinary(text)) text = Hex.encode(v);
-			card.nationalData.put("tag_" + tlv.t.toString(), text);
+			card.putNationalData("tag_" + tlv.t.toString(), text);
 		}
 	}
 

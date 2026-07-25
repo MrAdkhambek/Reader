@@ -10,8 +10,8 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.adkhambek.reader.common.Hex;
-import com.adkhambek.reader.common.tech.Iso7816;
+import com.adkhambek.reader.nfc.tech.Hex;
+import com.adkhambek.reader.nfc.tech.Iso7816;
 
 /**
  * ICAO 9303 Basic Access Control. Holds the derived session keys (KS_ENC, KS_MAC)

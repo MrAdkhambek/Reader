@@ -2,55 +2,66 @@
 package com.adkhambek.reader.common.mrz;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 public class MrzTest {
 
+	/** ICAO worked example, 88 chars (2×44). */
+	private static final String TD3 =
+			"P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<" +
+			"L898902C36UTO7408122F1204159ZE184226B<<<<<10";
+
+	/** 90 chars (3×30). */
+	private static final String TD1 =
+			"I<UTOD231458907<<<<<<<<<<<<<<<" +
+			"7408122F1204159UTO<<<<<<<<<<<6" +
+			"ERIKSSON<<ANNA<MARIA<<<<<<<<<<";
+
+	/** 72 chars (2×36). Same person/dates as the TD1 fixture, in TD2 layout. */
+	private static final String TD2 =
+			"I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<" +
+			"D231458907UTO7408122F1204159<<<<<<<0";
+
 	@Test public void decodeTd3_passport() {
 		// ICAO worked example TD3.
-		final String mrz =
-				"P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<" +
-				"L898902C36UTO7408122F1204159ZE184226B<<<<<10";
-		final IdCard c = new IdCard();
-		Mrz.decodeMrz(mrz, c);
-		assertEquals("P", c.documentType);
-		assertEquals("UTO", c.issuingCountry);
-		assertEquals("L898902C3", c.documentNumber);
-		assertEquals("ERIKSSON", c.lastName);
-		assertEquals("ANNA MARIA", c.firstName);
-		assertEquals("F", c.sex);
-		assertEquals("UTO", c.nationality);
-		assertEquals("1974-08-12", c.dateOfBirth);
-		assertEquals("2012-04-15", c.dateOfExpiry);
-		assertEquals("ZE184226B", c.personalNumber);
+		final String mrz = TD3;
+		final IdCard c = Mrz.decode(mrz);
+		assertEquals("P", c.documentType());
+		assertEquals("UTO", c.issuingCountry());
+		assertEquals("L898902C3", c.documentNumber());
+		assertEquals("ERIKSSON", c.lastName());
+		assertEquals("ANNA MARIA", c.firstName());
+		assertEquals("F", c.sex());
+		assertEquals("UTO", c.nationality());
+		assertEquals("1974-08-12", c.dateOfBirth());
+		assertEquals("2012-04-15", c.dateOfExpiry());
+		assertEquals("ZE184226B", c.personalNumber());
 	}
 
 	@Test public void decodeTd1_idCard() {
 		// 90-char TD1: 3 lines of 30.
-		final String mrz =
-				"I<UTOD231458907<<<<<<<<<<<<<<<" +
-				"7408122F1204159UTO<<<<<<<<<<<6" +
-				"ERIKSSON<<ANNA<MARIA<<<<<<<<<<";
-		final IdCard c = new IdCard();
-		Mrz.decodeMrz(mrz, c);
-		assertEquals("I", c.documentType);
-		assertEquals("UTO", c.issuingCountry);
-		assertEquals("D23145890", c.documentNumber);
-		assertEquals("F", c.sex);
-		assertEquals("UTO", c.nationality);
-		assertEquals("1974-08-12", c.dateOfBirth);
-		assertEquals("2012-04-15", c.dateOfExpiry);
-		assertEquals("ERIKSSON", c.lastName);
-		assertEquals("ANNA MARIA", c.firstName);
+		final String mrz = TD1;
+		final IdCard c = Mrz.decode(mrz);
+		assertEquals("I", c.documentType());
+		assertEquals("UTO", c.issuingCountry());
+		assertEquals("D23145890", c.documentNumber());
+		assertEquals("F", c.sex());
+		assertEquals("UTO", c.nationality());
+		assertEquals("1974-08-12", c.dateOfBirth());
+		assertEquals("2012-04-15", c.dateOfExpiry());
+		assertEquals("ERIKSSON", c.lastName());
+		assertEquals("ANNA MARIA", c.firstName());
 	}
 
 	@Test public void decodeMrz_unknownLengthIsNoop() {
-		final IdCard c = new IdCard();
-		Mrz.decodeMrz("too short", c);
-		assertNull(c.documentNumber);
-		assertEquals("too short", c.rawMrz);
+		final IdCard c = Mrz.decode("too short");
+		assertNull(c.documentNumber());
+		assertFalse(c.hasMrz());
+		assertEquals("too short", c.rawMrz());
 	}
 
 	/** Birth dates with YY > 50 fall in the 1900s. */
@@ -58,9 +69,8 @@ public class MrzTest {
 		final String mrz =
 				"P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<" +
 				"L898902C36UTO5808122F1204159ZE184226B<<<<<10";
-		final IdCard c = new IdCard();
-		Mrz.decodeMrz(mrz, c);
-		assertEquals("1958-08-12", c.dateOfBirth);
+		final IdCard c = Mrz.decode(mrz);
+		assertEquals("1958-08-12", c.dateOfBirth());
 	}
 
 	/** Boundary: YY == 50 is a birth year in the 1900s (born 1950, not 2050). */
@@ -68,9 +78,8 @@ public class MrzTest {
 		final String mrz =
 				"P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<" +
 				"L898902C36UTO5008122F1204159ZE184226B<<<<<10";
-		final IdCard c = new IdCard();
-		Mrz.decodeMrz(mrz, c);
-		assertEquals("1950-08-12", c.dateOfBirth);
+		final IdCard c = Mrz.decode(mrz);
+		assertEquals("1950-08-12", c.dateOfBirth());
 	}
 
 	/** Structurally impossible months/days fall back to the raw field rather
@@ -79,8 +88,85 @@ public class MrzTest {
 		final String mrz =
 				"P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<" +
 				"L898902C36UTO7499992F1204159ZE184226B<<<<<10";
-		final IdCard c = new IdCard();
-		Mrz.decodeMrz(mrz, c);
-		assertEquals("749999", c.dateOfBirth);
+		final IdCard c = Mrz.decode(mrz);
+		assertEquals("749999", c.dateOfBirth());
+	}
+
+	// --- TD2 -------------------------------------------------------------------
+
+	/** TD2 (72 chars) — the third format the library claims to support. */
+	@Test public void decodeTd2_travelDocument() {
+		final IdCard c = Mrz.decode(TD2);
+		assertEquals("I", c.documentType());
+		assertEquals("UTO", c.issuingCountry());
+		assertEquals("D23145890", c.documentNumber());
+		assertEquals("ERIKSSON", c.lastName());
+		assertEquals("ANNA MARIA", c.firstName());
+		assertEquals("F", c.sex());
+		assertEquals("UTO", c.nationality());
+		assertEquals("1974-08-12", c.dateOfBirth());
+		assertEquals("2012-04-15", c.dateOfExpiry());
+	}
+
+	// --- isValidMrz: the check-digit gate on untrusted (scanned) input ---------
+
+	@Test public void isValidMrz_acceptsAllThreeFormats() {
+		assertTrue(Mrz.isValidMrz(TD1));
+		assertTrue(Mrz.isValidMrz(TD2));
+		assertTrue(Mrz.isValidMrz(TD3));
+	}
+
+	@Test public void isValidMrz_rejectsNullAndWrongLength() {
+		assertFalse(Mrz.isValidMrz(null));
+		assertFalse(Mrz.isValidMrz(""));
+		assertFalse(Mrz.isValidMrz("NOT AN MRZ"));
+		// 89 chars: one short of TD3, one over TD1's 88... neither length is an MRZ.
+		assertFalse(Mrz.isValidMrz(TD3 + "X"));
+	}
+
+	/**
+	 * The point of the gate: a payload of the right *length* but wrong content
+	 * must not pass. Without the check digits, {@code decodeMrz} happily fills in
+	 * fields from arbitrary 88-character noise.
+	 */
+	@Test public void isValidMrz_rejectsRightLengthNoise() {
+		final StringBuilder noise = new StringBuilder();
+		for (int i = 0; i < 88; ++i) noise.append('A');
+		assertFalse(Mrz.isValidMrz(noise.toString()));
+		assertEquals(88, noise.length());
+	}
+
+	/** Flipping any one of the three check digits must fail validation. */
+	@Test public void isValidMrz_rejectsCorruptedCheckDigits() {
+		// TD3 check digits sit at absolute indices 53 (doc no.), 63 (DOB), 71 (expiry).
+		assertFalse(Mrz.isValidMrz(bump(TD3, 53)));
+		assertFalse(Mrz.isValidMrz(bump(TD3, 63)));
+		assertFalse(Mrz.isValidMrz(bump(TD3, 71)));
+	}
+
+	/** A corrupted *field* is caught too — that's what the check digit is for. */
+	@Test public void isValidMrz_rejectsCorruptedField() {
+		// Index 44 is the first character of the TD3 document number.
+		assertFalse(Mrz.isValidMrz(bump(TD3, 44)));
+	}
+
+	/** Characters outside 0-9 / A-Z / '<' aren't MRZ characters at all. */
+	@Test public void isValidMrz_rejectsIllegalCharacters() {
+		final char[] cs = TD3.toCharArray();
+		cs[45] = '*';
+		assertFalse(Mrz.isValidMrz(new String(cs)));
+	}
+
+	/** A valid MRZ that passes the gate still decodes to a populated card. */
+	@Test public void isValidMrz_gatedDecodeYieldsCard() {
+		assertTrue(Mrz.isValidMrz(TD3));
+		assertTrue(Mrz.decode(TD3).hasMrz());
+	}
+
+	/** Replace the character at {@code index} with a different one. */
+	private static String bump(String s, int index) {
+		final char[] cs = s.toCharArray();
+		cs[index] = (cs[index] == '0') ? '1' : '0';
+		return new String(cs);
 	}
 }

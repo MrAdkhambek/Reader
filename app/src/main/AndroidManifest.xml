@@ -19,7 +19,7 @@
         android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar">
 
         <activity
-            android:name="com.adkhambek.reader.card.MainActivity"
+            android:name="com.adkhambek.reader.sample.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,7 +28,7 @@
         </activity>
 
         <activity
-            android:name="com.adkhambek.reader.card.BankCardActivity"
+            android:name="com.adkhambek.reader.sample.BankCardActivity"
             android:configChanges="orientation|screenSize"
             android:exported="true"
             android:label="@string/menu_bank"
@@ -42,18 +42,18 @@
         </activity>
 
         <activity
-            android:name="com.adkhambek.reader.card.IdInputActivity"
+            android:name="com.adkhambek.reader.sample.IdInputActivity"
             android:exported="false"
             android:label="@string/menu_id" />
 
         <activity
-            android:name="com.adkhambek.reader.card.IdReaderActivity"
+            android:name="com.adkhambek.reader.sample.IdReaderActivity"
             android:exported="false"
             android:label="@string/menu_id"
             android:launchMode="singleTop" />
 
         <activity
-            android:name="com.adkhambek.reader.card.QrScannerActivity"
+            android:name="com.adkhambek.reader.sample.QrScannerActivity"
             android:exported="false"
             android:label="@string/menu_qr"
             android:screenOrientation="portrait" />

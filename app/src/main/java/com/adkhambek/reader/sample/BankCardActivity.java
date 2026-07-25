@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.card;
+package com.adkhambek.reader.sample;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -78,7 +78,7 @@ public final class BankCardActivity extends Activity implements ReaderListener {
 	}
 
 	@Override
-	public void onResult(Result<Card, Exception> result) {
+	public void onResult(Result<Card, Throwable> result) {
 		if (destroyed || textView == null) return;
 		if (result.isErr()) {
 			textView.setText(getString(R.string.error_prefix, result.error().getMessage()));

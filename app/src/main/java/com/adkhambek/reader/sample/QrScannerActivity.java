@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.card;
+package com.adkhambek.reader.sample;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
@@ -82,17 +82,17 @@ public final class QrScannerActivity extends ComponentActivity {
 
 	private static String renderIdCard(IdCard c) {
 		final StringBuilder sb = new StringBuilder();
-		line(sb, "Document type", c.documentType);
-		line(sb, "Issuing country", c.issuingCountry);
-		line(sb, "Document number", c.documentNumber);
-		line(sb, "Last name", c.lastName);
-		line(sb, "First name", c.firstName);
-		line(sb, "Sex", c.sex);
-		line(sb, "Nationality", c.nationality);
-		line(sb, "Date of birth", c.dateOfBirth);
-		line(sb, "Date of expiry", c.dateOfExpiry);
-		line(sb, "Personal number", c.personalNumber);
-		line(sb, "Optional data", c.optionalData);
+		line(sb, "Document type", c.documentType());
+		line(sb, "Issuing country", c.issuingCountry());
+		line(sb, "Document number", c.documentNumber());
+		line(sb, "Last name", c.lastName());
+		line(sb, "First name", c.firstName());
+		line(sb, "Sex", c.sex());
+		line(sb, "Nationality", c.nationality());
+		line(sb, "Date of birth", c.dateOfBirth());
+		line(sb, "Date of expiry", c.dateOfExpiry());
+		line(sb, "Personal number", c.personalNumber());
+		line(sb, "Optional data", c.optionalData());
 		return sb.toString();
 	}
 

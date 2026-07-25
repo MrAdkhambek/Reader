@@ -6,7 +6,7 @@ import android.annotation.SuppressLint;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.adkhambek.reader.common.Hex;
+import com.adkhambek.reader.nfc.tech.Hex;
 
 /**
  * ISO 9797-1 Algorithm 3 (Retail MAC) with DES, single-key K1 and K2 from a

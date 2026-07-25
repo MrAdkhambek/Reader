@@ -3,24 +3,38 @@ package com.adkhambek.reader.common.mrz;
 
 import java.util.Locale;
 
-import com.adkhambek.reader.common.tech.Iso7816;
-
 /**
- * DG1 parser — strips the 5F1F TLV wrapper and decodes the raw MRZ string
+ * Decoder for a raw ICAO 9303 machine-readable zone
  * (TD1: 3×30 chars / 90 total, TD2: 2×36 / 72 total, TD3: 2×44 / 88 total).
+ *
+ * <p>Pure string handling — no Android or APDU dependency, so it is equally
+ * usable on an MRZ read off a chip (DG1) and one scanned from a QR code.
+ * Unwrapping the DG1 5F1F TLV lives in the NFC module's {@code DgParser}.
  */
 public final class Mrz {
 	private Mrz() {
 	}
 
-	public static void decodeDg1(byte[] dg1, IdCard out) {
-		final Iso7816.BerTLV mrzTlv = Iso7816.BerHouse.from(dg1).findFirst(0x5F1F);
-		if (mrzTlv == null) return;
-		decodeMrz(new String(mrzTlv.v.getBytes()), out);
+	/**
+	 * Decode an MRZ into a fresh {@link IdCard}.
+	 *
+	 * <p>Does not validate — an unrecognised length yields a card carrying only
+	 * {@link IdCard#rawMrz()}, and a same-length string of noise yields populated
+	 * but meaningless fields. Gate untrusted input on {@link #isValidMrz} first,
+	 * or check {@link IdCard#hasMrz()} on the result.
+	 */
+	public static IdCard decode(String mrz) {
+		final IdCard.Builder b = new IdCard.Builder();
+		decodeMrz(mrz, b);
+		return b.build();
 	}
 
-	public static void decodeMrz(String mrz, IdCard out) {
-		out.rawMrz = mrz;
+	/**
+	 * Decode an MRZ into an existing builder. Used by the eMRTD reader, which
+	 * merges DG1 with the other data groups before building.
+	 */
+	public static void decodeMrz(String mrz, IdCard.Builder out) {
+		out.rawMrz(mrz);
 		switch (mrz.length()) {
 			case 90: decodeTd1(mrz, out); break;
 			case 72: decodeTd2(mrz, out); break;
@@ -100,58 +114,59 @@ public final class Mrz {
 		return expect == (ck - '0');
 	}
 
-	private static void decodeTd1(String m, IdCard out) {
+	private static void decodeTd1(String m, IdCard.Builder out) {
 		final String l1 = m.substring(0, 30);
 		final String l2 = m.substring(30, 60);
 		final String l3 = m.substring(60, 90);
 		final String[] names = splitName(l3);
 
-		out.documentType = clean(l1.substring(0, 2));
-		out.issuingCountry = clean(l1.substring(2, 5));
-		out.documentNumber = clean(l1.substring(5, 14));
-		final String optional1 = clean(l1.substring(15, 30));
-		if (!optional1.isEmpty()) out.optionalData = optional1;
+		out.documentType(clean(l1.substring(0, 2)))
+				.issuingCountry(clean(l1.substring(2, 5)))
+				.documentNumber(clean(l1.substring(5, 14)))
+				.lastName(names[0])
+				.firstName(names[1])
+				.sex(decodeSex(l2.charAt(7)))
+				.nationality(clean(l2.substring(15, 18)))
+				.dateOfBirth(formatDate(l2.substring(0, 6), false))
+				.dateOfExpiry(formatDate(l2.substring(8, 14), true));
 
-		out.lastName = names[0];
-		out.firstName = names[1];
-		out.sex = decodeSex(l2.charAt(7));
-		out.nationality = clean(l2.substring(15, 18));
-		out.dateOfBirth = formatDate(l2.substring(0, 6), false);
-		out.dateOfExpiry = formatDate(l2.substring(8, 14), true);
+		final String optional1 = clean(l1.substring(15, 30));
+		if (!optional1.isEmpty()) out.optionalData(optional1);
 	}
 
-	private static void decodeTd2(String m, IdCard out) {
+	private static void decodeTd2(String m, IdCard.Builder out) {
 		final String l1 = m.substring(0, 36);
 		final String l2 = m.substring(36, 72);
 		final String[] names = splitName(l1.substring(5, 36));
 
-		out.documentType = clean(l1.substring(0, 2));
-		out.issuingCountry = clean(l1.substring(2, 5));
-		out.documentNumber = clean(l2.substring(0, 9));
-		out.lastName = names[0];
-		out.firstName = names[1];
-		out.sex = decodeSex(l2.charAt(20));
-		out.nationality = clean(l2.substring(10, 13));
-		out.dateOfBirth = formatDate(l2.substring(13, 19), false);
-		out.dateOfExpiry = formatDate(l2.substring(21, 27), true);
+		out.documentType(clean(l1.substring(0, 2)))
+				.issuingCountry(clean(l1.substring(2, 5)))
+				.documentNumber(clean(l2.substring(0, 9)))
+				.lastName(names[0])
+				.firstName(names[1])
+				.sex(decodeSex(l2.charAt(20)))
+				.nationality(clean(l2.substring(10, 13)))
+				.dateOfBirth(formatDate(l2.substring(13, 19), false))
+				.dateOfExpiry(formatDate(l2.substring(21, 27), true));
 	}
 
-	private static void decodeTd3(String m, IdCard out) {
+	private static void decodeTd3(String m, IdCard.Builder out) {
 		final String l1 = m.substring(0, 44);
 		final String l2 = m.substring(44, 88);
 		final String[] names = splitName(l1.substring(5, 44));
 
-		out.documentType = clean(l1.substring(0, 2));
-		out.issuingCountry = clean(l1.substring(2, 5));
-		out.documentNumber = clean(l2.substring(0, 9));
-		out.lastName = names[0];
-		out.firstName = names[1];
-		out.sex = decodeSex(l2.charAt(20));
-		out.nationality = clean(l2.substring(10, 13));
-		out.dateOfBirth = formatDate(l2.substring(13, 19), false);
-		out.dateOfExpiry = formatDate(l2.substring(21, 27), true);
+		out.documentType(clean(l1.substring(0, 2)))
+				.issuingCountry(clean(l1.substring(2, 5)))
+				.documentNumber(clean(l2.substring(0, 9)))
+				.lastName(names[0])
+				.firstName(names[1])
+				.sex(decodeSex(l2.charAt(20)))
+				.nationality(clean(l2.substring(10, 13)))
+				.dateOfBirth(formatDate(l2.substring(13, 19), false))
+				.dateOfExpiry(formatDate(l2.substring(21, 27), true));
+
 		final String personalNr = clean(l2.substring(28, 42));
-		if (!personalNr.isEmpty()) out.personalNumber = personalNr;
+		if (!personalNr.isEmpty()) out.personalNumber(personalNr);
 	}
 
 	private static String[] splitName(String namePart) {

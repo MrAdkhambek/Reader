@@ -1,22 +1,15 @@
 plugins {
-    id("com.android.application")
+    id("read3r.android-application")
 }
 
 android {
-    namespace = "com.adkhambek.reader.card"
-    compileSdk = 34
+    namespace = "com.adkhambek.reader.sample"
 
     defaultConfig {
-        applicationId = "com.adkhambek.reader.card"
-        minSdk = 21
-        targetSdk = 34
+        applicationId = "com.adkhambek.reader.sample"
         versionCode = 16
-        versionName = "2.3.0"
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        // Single source of truth with the published library version.
+        versionName = providers.gradleProperty("VERSION_NAME").get()
     }
 
     buildTypes {
@@ -31,10 +24,8 @@ android {
     }
 
     lint {
-        // Treat any remaining warnings as build errors so they can't accumulate.
-        warningsAsErrors = true
-
-        // Deliberate design choices, not bugs:
+        // On top of the convention plugin's warningsAsErrors — deliberate design
+        // choices, not bugs:
         //   OldTargetApi          — pinned to 34. Bumping to 35 introduces real
         //                            behavior changes (edge-to-edge enforcement
         //                            on Android 15) that need device validation.
@@ -49,7 +40,6 @@ android {
             "LockedOrientationActivity",
             "DiscouragedApi",
             "UnnecessaryRequiredFeature",
-            "GradleDependency",
             // allowBackup is needed for API 21-30 (where dataExtractionRules
             // isn't honored). dataExtractionRules covers 31+. Both are set —
             // the lint complaint is about the attribute being marked
@@ -65,10 +55,8 @@ dependencies {
     implementation(project(":qr"))
 
     // ComponentActivity = the minimum AndroidX dep needed for CameraX's LifecycleOwner.
-    implementation("androidx.activity:activity:1.8.2")
+    implementation(libs.androidx.activity)
 
-    // Align all kotlin-stdlib variants. CameraX 1.3 pulls kotlin-stdlib-jdk7/jdk8:1.6.21
-    // and androidx.activity pulls kotlin-stdlib:1.8.x — 1.8 merged the jdk7/jdk8 classes
-    // into the base stdlib, so without the BOM we get a duplicate-class dex error.
-    implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.22"))
+    // The kotlin-stdlib alignment CameraX needs is published by :qr itself, so
+    // external consumers get it too — see qr/build.gradle.kts.
 }

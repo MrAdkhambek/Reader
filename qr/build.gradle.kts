@@ -1,54 +1,35 @@
-import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
-
 plugins {
-    id("com.android.library")
-    id("com.vanniktech.maven.publish")
+    id("read3r.android-library")
 }
 
 android {
     namespace = "com.adkhambek.reader.qr"
-    compileSdk = 34
-
-    defaultConfig {
-        minSdk = 21
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    testOptions {
-        unitTests {
-            isReturnDefaultValues = true
-        }
-    }
-
-    lint {
-        warningsAsErrors = true
-        disable += "GradleDependency"
-    }
-}
-
-mavenPublishing {
-    configure(AndroidSingleVariantLibrary(
-        variant = "release",
-        sourcesJar = true,
-        publishJavadocJar = false,
-    ))
 }
 
 dependencies {
     api(project(":common"))
 
-    api("androidx.camera:camera-core:1.3.4")
-    api("androidx.camera:camera-camera2:1.3.4")
-    api("androidx.camera:camera-lifecycle:1.3.4")
-    api("androidx.camera:camera-view:1.3.4")
-    api("androidx.lifecycle:lifecycle-common:2.7.0")
+    // Align every kotlin-stdlib variant on the consumer's classpath. CameraX 1.3
+    // pulls kotlin-stdlib-jdk7/jdk8:1.6.21 while any modern androidx artifact
+    // pulls kotlin-stdlib:1.8.x — 1.8 folded the jdk7/jdk8 classes into the base
+    // stdlib, so the two together are a duplicate-class dex failure.
+    //
+    // This is `api(platform(...))`, not `implementation`, on purpose: it has to
+    // reach whoever depends on the published qr artifact. Declared app-side it
+    // would fix only this repo's sample and leave every external consumer to
+    // rediscover the same crash.
+    api(platform(libs.kotlin.bom))
 
-    implementation("androidx.core:core:1.13.1")
-    implementation("com.google.zxing:core:3.5.3")
+    // api, not implementation: these types are on the public surface —
+    // QrScannerView.getPreviewView() returns a PreviewView and
+    // setLifecycleOwner() takes a LifecycleOwner.
+    api(libs.camera.core)
+    api(libs.camera.camera2)
+    api(libs.camera.lifecycle)
+    api(libs.camera.view)
+    api(libs.lifecycle.common)
 
-    testImplementation("junit:junit:4.13.2")
+    // Internal only — ScanResult carries float[]/int, never a ZXing type.
+    implementation(libs.androidx.core)
+    implementation(libs.zxing.core)
 }

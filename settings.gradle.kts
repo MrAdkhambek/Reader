@@ -1,4 +1,6 @@
 pluginManagement {
+    // Convention plugins (read3r.*) that carry the shared Android / publishing setup.
+    includeBuild("build-logic")
     repositories {
         google()
         mavenCentral()

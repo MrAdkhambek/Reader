@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.common;
+package com.adkhambek.reader.nfc.tech;
 
 /**
  * Byte / hex / packed-block helpers shared by the bank-card and ID-card readers.

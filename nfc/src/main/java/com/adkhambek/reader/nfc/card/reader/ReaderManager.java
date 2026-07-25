@@ -17,11 +17,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.adkhambek.reader.nfc.card.bean.Card;
 import com.adkhambek.reader.nfc.card.bean.CardApp;
-import com.adkhambek.reader.common.Hex;
+import com.adkhambek.reader.nfc.tech.Hex;
 import com.adkhambek.reader.common.Result;
 import com.adkhambek.reader.common.WorkerThread;
 
 public final class ReaderManager {
+	private static final String TAG = "NFCard";
+
 	private static final ExecutorService EXEC = Executors.newSingleThreadExecutor(new ThreadFactory() {
 		private final AtomicInteger n = new AtomicInteger();
 
@@ -42,7 +44,7 @@ public final class ReaderManager {
 	 * (this method does NFC I/O which would block the main thread).
 	 */
 	@WorkerThread
-	public static Result<Card, Exception> readCard(final Tag tag) {
+	public static Result<Card, Throwable> readCard(final Tag tag) {
 		return doRead(tag);
 	}
 
@@ -54,16 +56,14 @@ public final class ReaderManager {
 		});
 
 		EXEC.execute(() -> {
-			Result<Card, Exception> result;
+			Result<Card, Throwable> result;
 			try {
 				result = doRead(tag);
 			} catch (Throwable t) {
-				Log.e("NFCard", "doRead threw", t);
-				result = Result.err(t instanceof Exception
-						? (Exception) t
-						: new RuntimeException(t));
+				Log.e(TAG, "doRead threw", t);
+				result = Result.err(t);
 			}
-			final Result<Card, Exception> finalResult = result;
+			final Result<Card, Throwable> finalResult = result;
 			MAIN.post(() -> {
 				final ReaderListener l = weak.get();
 				if (l != null) l.onResult(finalResult);
@@ -71,14 +71,14 @@ public final class ReaderManager {
 		});
 	}
 
-	private static Result<Card, Exception> doRead(Tag tag) {
+	private static Result<Card, Throwable> doRead(Tag tag) {
 		if (tag == null) {
 			return Result.err(new IllegalArgumentException("tag is null"));
 		}
 
 		try {
 			final String uid = Hex.encode(tag.getId());
-			Log.i("NFCard", "readCard tag techCount=" + tag.getTechList().length);
+			Log.i(TAG, "readCard tag techCount=" + tag.getTechList().length);
 
 			List<CardApp> apps = Collections.emptyList();
 			final IsoDep isodep = IsoDep.get(tag);
@@ -88,20 +88,20 @@ public final class ReaderManager {
 					try {
 						isodep.setTimeout(5000);
 					} catch (Exception e) {
-						Log.w("NFCard", "setTimeout failed", e);
+						Log.w(TAG, "setTimeout failed", e);
 					}
 					apps = EMV.readCard(isodep);
 				} finally {
 					try {
 						isodep.close();
 					} catch (Exception e) {
-						Log.w("NFCard", "isodep.close failed", e);
+						Log.w(TAG, "isodep.close failed", e);
 					}
 				}
 			}
 			return Result.ok(new Card(uid, apps));
 		} catch (Exception e) {
-			Log.e("NFCard", "readCard failed", e);
+			Log.e(TAG, "readCard failed", e);
 			return Result.err(e);
 		}
 	}

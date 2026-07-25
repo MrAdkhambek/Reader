@@ -1,5 +1,5 @@
-plugins {
-    id("com.android.application") version "8.7.3" apply false
-    id("com.android.library") version "8.7.3" apply false
-    id("com.vanniktech.maven.publish") version "0.30.0" apply false
-}
+// Nothing to configure at the root.
+//
+// Plugin and dependency versions live in gradle/libs.versions.toml.
+// Shared Android / publishing setup lives in the read3r.* convention plugins
+// under build-logic/, which each module applies by id.

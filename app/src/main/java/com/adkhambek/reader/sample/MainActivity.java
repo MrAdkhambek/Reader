@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.card;
+package com.adkhambek.reader.sample;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 

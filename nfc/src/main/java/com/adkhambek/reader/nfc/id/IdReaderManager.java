@@ -14,16 +14,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.adkhambek.reader.common.Hex;
+import com.adkhambek.reader.nfc.tech.Hex;
 import com.adkhambek.reader.common.Result;
 import com.adkhambek.reader.common.WorkerThread;
-import com.adkhambek.reader.common.tech.Iso7816;
+import com.adkhambek.reader.nfc.tech.Iso7816;
 import com.adkhambek.reader.nfc.id.bac.Bac;
 import com.adkhambek.reader.nfc.id.bac.SecureMessaging;
 import com.adkhambek.reader.common.mrz.IdCard;
 import com.adkhambek.reader.nfc.id.dg.Dg2;
 import com.adkhambek.reader.nfc.id.dg.DgParser;
-import com.adkhambek.reader.common.mrz.Mrz;
 
 /**
  * Async/sync entry points for reading an ICAO 9303 eMRTD (passport / national
@@ -65,7 +64,7 @@ public final class IdReaderManager {
 	}
 
 	@WorkerThread
-	public static Result<IdCard, Exception> readCard(Tag tag, MrzKey key) {
+	public static Result<IdCard, Throwable> readCard(Tag tag, MrzKey key) {
 		return doRead(tag, key);
 	}
 
@@ -77,14 +76,14 @@ public final class IdReaderManager {
 		});
 
 		EXEC.execute(() -> {
-			Result<IdCard, Exception> result;
+			Result<IdCard, Throwable> result;
 			try {
 				result = doRead(tag, key);
 			} catch (Throwable t) {
 				Log.e(TAG, "doRead threw", t);
-				result = Result.err(t instanceof Exception ? (Exception) t : new RuntimeException(t));
+				result = Result.err(t);
 			}
-			final Result<IdCard, Exception> finalResult = result;
+			final Result<IdCard, Throwable> finalResult = result;
 			MAIN.post(() -> {
 				final IdReaderListener l = weak.get();
 				if (l != null) l.onResult(finalResult);
@@ -92,7 +91,7 @@ public final class IdReaderManager {
 		});
 	}
 
-	private static Result<IdCard, Exception> doRead(Tag tag, MrzKey key) {
+	private static Result<IdCard, Throwable> doRead(Tag tag, MrzKey key) {
 		if (tag == null) return Result.err(new IllegalArgumentException("tag is null"));
 		if (key == null) return Result.err(new IllegalArgumentException("MRZ key is null"));
 
@@ -100,7 +99,7 @@ public final class IdReaderManager {
 		if (iso == null) return Result.err(new IllegalStateException("Card is not ISO-DEP"));
 
 		final Iso7816.StdTag std = new Iso7816.StdTag(iso);
-		final IdCard card = new IdCard();
+		final IdCard.Builder card = new IdCard.Builder();
 
 		try {
 			std.connect();
@@ -122,10 +121,10 @@ public final class IdReaderManager {
 			final SecureMessaging sm = new SecureMessaging(bac);
 
 			final byte[] com = readEf(sm, std, FID_COM);
-			if (com != null) card.presentDataGroups = DgParser.parseCom(com);
+			if (com != null) card.presentDataGroups(DgParser.parseCom(com));
 
 			final byte[] dg1 = readEf(sm, std, FID_DG1);
-			if (dg1 != null) Mrz.decodeDg1(dg1, card);
+			if (dg1 != null) DgParser.parseDg1(dg1, card);
 
 			final byte[] dg11 = tryReadEf(sm, std, FID_DG11);
 			if (dg11 != null) DgParser.parseDg11(dg11, card);
@@ -137,11 +136,10 @@ public final class IdReaderManager {
 			final byte[] dg2 = tryReadEf(sm, std, FID_DG2);
 			if (dg2 != null) {
 				final Dg2.Image img = Dg2.extract(dg2);
-				card.photoFormat = img.format;
-				card.photoBytes = img.data;
+				card.photo(img.format, img.data);
 			}
 
-			return Result.ok(card);
+			return Result.ok(card.build());
 		} catch (Exception e) {
 			Log.e(TAG, "doRead failed", e);
 			return Result.err(e);

@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.common.tech;
+package com.adkhambek.reader.nfc.tech;
 
 import android.nfc.tech.IsoDep;
 import android.util.Log;
@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import com.adkhambek.reader.common.Hex;
 
 /**
  * APDU framing + BER-TLV parsing used by both the EMV bank-card reader and the
