@@ -71,7 +71,7 @@ Each was decided explicitly during design; the rationale is recorded so it doesn
 | Artifact | Packaging | Language | Depends on | Contents |
 |---|---|---|---|---|
 | `com.adkhambek.reader:mrz` | **jar** | Java | — | `Mrz`, `MrzDocument`, `PhotoFormat`, `MrzFormatException` |
-| `com.adkhambek.reader:iso7816` | aar | Java | — | `ApduChannel`, `IsoDepChannel`, BER-TLV types, APDU framing, `Hex`, `NfcManager` |
+| `com.adkhambek.reader:iso7816` | aar | Java | — | `ApduChannel`, `IsoDepChannel`, BER-TLV types, APDU framing, `Hex`, `NfcManager`, the `ReadException` hierarchy |
 | `com.adkhambek.reader:emv` | aar | Java | `iso7816` | `EmvReader`, `EmvCard`, `EmvApp`, `Currency` |
 | `com.adkhambek.reader:emv-ktx` | aar | Kotlin | `emv` | `Flow` extensions |
 | `com.adkhambek.reader:emrtd` | aar | Java | `iso7816`, `mrz` | `PassportReader`, `Passport`, BAC, Secure Messaging, DG parsers, `MrzKey` |
@@ -177,12 +177,16 @@ public final class MrzKey {              // unchanged: documentNumber + YYMMDD d
 
 ### Error model
 
+Declared once, in `:iso7816`, and shared by both readers:
+
 ```java
 public class ReadException extends Exception { }
 public final class CardLostException            extends ReadException { }  // tag left the field mid-read
 public final class AuthenticationException      extends ReadException { }  // BAC failed
 public final class UnsupportedDocumentException extends ReadException { }  // no eMRTD applet / no PPSE
 ```
+
+`:iso7816` is the only module both `:emv` and `:emrtd` depend on, and nothing else depends on it — `:qr` pulls ZXing alone and `:qr-ktx` pulls `:qr` and `:mrz`. So a QR-only consumer never sees these types, and a consumer using both readers writes one catch block rather than two unrelated ones.
 
 Checked, because these are recoverable conditions a Java caller should be forced to consider. Kotlin has no checked exceptions, so ktx callers are unaffected.
 
