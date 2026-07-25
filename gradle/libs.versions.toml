@@ -16,6 +16,9 @@ lifecycle = "2.7.0"
 zxing = "3.5.3"
 # Aligns the kotlin-stdlib variants CameraX and androidx drag in; see qr/build.gradle.kts.
 kotlin = "1.8.22"
+kotlinPlugin = "2.0.21"
+coroutines = "1.8.1"
+androidxAnnotation = "1.8.2"
 
 # Test
 junit = "4.13.2"
@@ -30,6 +33,10 @@ camera-view = { module = "androidx.camera:camera-view", version.ref = "camerax" 
 lifecycle-common = { module = "androidx.lifecycle:lifecycle-common", version.ref = "lifecycle" }
 zxing-core = { module = "com.google.zxing:core", version.ref = "zxing" }
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
+coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "androidxAnnotation" }
+kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinPlugin" }
 junit = { module = "junit:junit", version.ref = "junit" }
 
 # Consumed only by build-logic/, so the convention plugins can apply these.

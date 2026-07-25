@@ -8,4 +8,5 @@ dependencies {
     // publish plugin in as ordinary dependencies.
     implementation(libs.android.gradlePlugin)
     implementation(libs.mavenPublish.gradlePlugin)
+    implementation(libs.kotlin.gradlePlugin)
 }
