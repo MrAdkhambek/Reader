@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature
+        android:name="android.hardware.nfc"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <application
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/backup_rules"
+        android:icon="@drawable/nfcard"
+        android:label="@string/app_name"
+        android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar">
+
+        <activity
+            android:name="com.adkhambek.reader.card.MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.adkhambek.reader.card.BankCardActivity"
+            android:configChanges="orientation|screenSize"
+            android:exported="true"
+            android:label="@string/menu_bank"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.nfc.action.TECH_DISCOVERED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.nfc.action.TECH_DISCOVERED"
+                android:resource="@xml/nfc_tech_filter" />
+        </activity>
+
+        <activity
+            android:name="com.adkhambek.reader.card.IdInputActivity"
+            android:exported="false"
+            android:label="@string/menu_id" />
+
+        <activity
+            android:name="com.adkhambek.reader.card.IdReaderActivity"
+            android:exported="false"
+            android:label="@string/menu_id"
+            android:launchMode="singleTop" />
+
+        <activity
+            android:name="com.adkhambek.reader.card.QrScannerActivity"
+            android:exported="false"
+            android:label="@string/menu_qr"
+            android:screenOrientation="portrait" />
+
+    </application>
+
+</manifest>

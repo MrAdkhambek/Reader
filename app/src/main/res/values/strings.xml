@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Read3r</string>
+    <string name="menu_bank">Bank card (EMV)</string>
+    <string name="menu_id">ID / Passport (eMRTD)</string>
+    <string name="menu_qr">QR code</string>
+    <string name="qr_prompt">Point the camera at the QR code on the back of the card.</string>
+    <string name="qr_permission_needed">Camera permission is needed to scan QR codes.</string>
+    <string name="qr_raw_prefix">Raw QR contents:\n%1$s</string>
+    <string name="bank_prompt">Tap an NFC card to the back of the phone.</string>
+    <string name="reading">Reading…</string>
+    <string name="unknown_card">Unknown card.</string>
+    <string name="error_prefix">Error: %1$s</string>
+    <string name="id_doc_label">Document number</string>
+    <string name="id_doc_hint">e.g. AB1234567</string>
+    <string name="id_dob_label">Date of birth (YYMMDD)</string>
+    <string name="id_dob_hint">900101</string>
+    <string name="id_exp_label">Date of expiry (YYMMDD)</string>
+    <string name="id_exp_hint">301231</string>
+    <string name="id_read">Read</string>
+    <string name="id_fill_all">Fill all fields (dates as YYMMDD)</string>
+    <string name="id_prompt">Tap your ID card on the back of the phone…</string>
+    <string name="id_reading">Reading… keep the card on the phone.</string>
+    <string name="id_missing_key">Missing MRZ key. Open the app from the menu first.</string>
+    <string name="id_photo_not_displayable">[Photo present (%1$s) but not displayable on this device]</string>
+</resources>

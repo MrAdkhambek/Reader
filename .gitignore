@@ -1,0 +1,35 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!src/**/build/
+
+# Local configuration — machine-specific SDK path, never commit.
+local.properties
+
+# Android build outputs
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+release/
+# R8 mapping / seeds / usage reports live under build/, but also guard the
+# case where someone copies them out.
+mapping.txt
+
+# Kotlin incremental state (no Kotlin sources here, but the plugin drops this)
+.kotlin/
+
+# IntelliJ / Android Studio
+.idea/
+*.iml
+captures/
+.navigation/
+
+# macOS
+.DS_Store
+
+# Logs and temp
+*.log
+*.hprof

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 12+ data-extraction rules. We hold a transient MRZ form in
+  SharedPreferences (nfcid.prefs) — exclude it from both cloud backup and
+  device-to-device transfer. There is no other app data worth backing up.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" path="nfcid.prefs.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="nfcid.prefs.xml" />
+    </device-transfer>
+</data-extraction-rules>
