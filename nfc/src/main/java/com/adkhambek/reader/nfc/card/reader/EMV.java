@@ -27,6 +27,7 @@ public final class EMV {
 	public static List<CardApp> readCard(IsoDep tech) throws IOException {
 		final List<CardApp> apps = new ArrayList<>();
 		final Iso7816.StdTag tag = new Iso7816.StdTag(new IsoDepChannel(tech));
+		final boolean alreadyConnected = tech.isConnected();
 		tag.connect();
 
 		try {
@@ -46,7 +47,7 @@ public final class EMV {
 				if (app != null) apps.add(app);
 			}
 		} finally {
-			tag.close();
+			if (!alreadyConnected) tag.close();
 		}
 		return apps;
 	}

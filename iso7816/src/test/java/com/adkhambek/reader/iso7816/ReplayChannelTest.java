@@ -62,4 +62,19 @@ public class ReplayChannelTest {
 		assertArrayEquals(Hex.decode("AABBCCDDEE"), r.getBytes());
 		ch.assertExhausted();
 	}
+
+	/** 6Cxx means "wrong Le, retry with this one" — the same APDU is resent
+	 *  with Le corrected, and no payload is appended for the 6Cxx round-trip. */
+	@Test public void stdTagRetriesWithCorrectedLeOn6Cxx() throws IOException {
+		final ReplayChannel ch = new ReplayChannel()
+				.expect("00A4040007A000000003101000").reply("6C05")
+				.expect("00A4040007A000000003101005").reply("AABBCCDDEE9000");
+
+		final Iso7816.Response r = new Iso7816.StdTag(ch)
+				.transceive(Hex.decode("00A4040007A000000003101000"));
+
+		assertEquals((short) 0x9000, r.getSw12());
+		assertArrayEquals(Hex.decode("AABBCCDDEE"), r.getBytes());
+		ch.assertExhausted();
+	}
 }
