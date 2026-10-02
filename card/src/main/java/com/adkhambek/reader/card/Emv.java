@@ -22,8 +22,12 @@ final class Emv {
 		if (!Apdu.ok(ppse)) return null;
 		final List<CardApp> apps = new ArrayList<>();
 		for (final Tlv aid : Tlv.findAll(Tlv.primitives(Apdu.data(ppse)), 0x4F)) {
-			final CardApp app = readApp(apdu, aid.value);
-			if (app != null) apps.add(app);
+			try {
+				final CardApp app = readApp(apdu, aid.value);
+				if (app != null) apps.add(app);
+			} catch (IllegalArgumentException malformed) {
+				// A malformed FCI/GPO skips this AID, not the whole card.
+			}
 		}
 		return apps;
 	}

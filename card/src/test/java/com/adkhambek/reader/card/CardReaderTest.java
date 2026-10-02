@@ -73,4 +73,19 @@ public class CardReaderTest {
 			throw new IOException("Tag was lost.");
 		}));
 	}
+
+	/** Review M5: a malformed GPO/FCI on one AID skips that AID, not the whole card. */
+	@Test public void malformedAidIsSkipped() throws ReadException {
+		final String ppse = "6F2C 840E325041592E5359532E4444463031 A51A BF0C17"
+				+ " 6109 4F07A0000000031010 610A 4F08A000000004101012 9000";
+		final Replay card = new Replay()
+				.expect(SELECT_PPSE).reply(ppse)
+				.expect(SELECT_VISA).reply(VISA_FCI)
+				.expect(GPO_NO_PDOL).reply("8006 1800 08010100 9000")
+				.expect("00B2010C00").reply(RECORD);
+		// second AID: FCI carries a PDOL whose tag has no length byte.
+		card.expect("00A4040008A00000000410101200").reply("6F07 A505 9F38029F 9000");
+		final Card result = CardReader.readWith("04A1B2C3", card);
+		assertEquals(1, result.apps().size());
+	}
 }
