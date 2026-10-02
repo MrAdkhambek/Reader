@@ -1,5 +1,7 @@
 # Read3r 3.0 — module and API redesign
 
+> **Superseded (2026-10-02)** by `docs/superpowers/specs/2026-10-02-three-library-design.md`: three Java libraries (`qr`, `passport`, `card`) with no shared artifact and no `-ktx` modules. Kept for history; do not execute.
+
 **Date:** 2026-07-25
 **Status:** approved, ready for implementation planning
 **Supersedes:** the `:app` / `:common` / `:nfc` / `:qr` layout on branch `read3r-restructure`
