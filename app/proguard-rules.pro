@@ -13,8 +13,8 @@
 # which ship inside the AAR — none of these modules need any, because none of
 # them use reflection, XML view inflation, serialization or Parcelable.
 #
-# The rules also cost something: keeping the whole public surface of :common,
-# :nfc and :qr stopped R8 shrinking a sample app that only exercises part of it.
+# The rules also cost something: keeping the whole public surface of :card,
+# :passport and :qr stopped R8 shrinking a sample app that only exercises part of it.
 # Everything the sample actually uses it calls directly, so reachability keeps
 # it; the activities are kept by the manifest.
 #

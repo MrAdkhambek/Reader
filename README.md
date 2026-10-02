@@ -6,7 +6,7 @@ Three independent Android libraries: read contactless **bank cards**, ICAO 9303 
 |---|---|---|
 | `com.adkhambek.reader:card:3.0.0` | EMV bank cards over NFC | androidx.annotation |
 | `com.adkhambek.reader:passport:3.0.0` | ePassports / eMRTD ID cards over NFC, MRZ text | androidx.annotation |
-| `com.adkhambek.reader:qr:3.0.0` | QR codes with the camera | CameraX, ZXing |
+| `com.adkhambek.reader:qr:3.0.0` | QR codes with the camera | CameraX, ZXing, lifecycle-common, the kotlin-bom platform |
 
 `minSdk` 21, Java 17. Apache 2.0.
 
@@ -37,10 +37,13 @@ private final CardReader reader = new CardReader();
 private Cancellable pending;
 
 private void onTag(Tag tag) {
-    runOnUiThread(() -> pending = reader.read(tag, new Callback<Card>() {
-        @Override public void onSuccess(Card card) { show(card); }
-        @Override public void onError(ReadException e) { show(e.reason()); }
-    }));
+    runOnUiThread(() -> {
+        if (pending != null) pending.cancel();   // drop the previous read first
+        pending = reader.read(tag, new Callback<Card>() {
+            @Override public void onSuccess(Card card) { show(card); }
+            @Override public void onError(ReadException e) { show(e.reason()); }
+        });
+    });
 }
 
 @Override protected void onDestroy() {
@@ -74,7 +77,9 @@ Either reader takes your own executors: `new CardReader(workExecutor, callbackEx
 ### What you get
 
 - **`Card`**: the tag UID and one `CardApp` per payment application — label, PAN, PAN sequence, cardholder, country, `Currency`, effective and expiry dates, app version.
-- **`Passport`**: `mrz()` (DG1), `personalDetails()` (DG11), `documentDetails()` (DG12), `nationalData()` (DG13), `photo()` (DG2, JPEG or JPEG 2000), `presentDataGroups()`. Optional groups that are absent are null.
+- **`Passport`**: `mrz()` (DG1), `personalDetails()` (DG11), `documentDetails()` (DG12), `nationalData()` (DG13), `photo()` (DG2, JPEG or JPEG 2000), `presentDataGroups()`. `nationalData()` and `presentDataGroups()` are never null (empty when absent); the other optional groups are null when absent.
+
+Elementary files are read up to 32 KB; a DG2 photo larger than that comes back null.
 
 Passport reads use extended-length APDUs when both phone and chip support them, which cuts a photo read from ~90 card exchanges to a handful.
 
