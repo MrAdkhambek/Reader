@@ -10,6 +10,10 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
+        // The sample app uses the published libraries; run publishToMavenLocal first.
+        mavenLocal {
+            content { includeGroup("com.adkhambek.reader") }
+        }
         google()
         mavenCentral()
     }

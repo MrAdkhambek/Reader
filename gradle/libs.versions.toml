@@ -17,11 +17,16 @@ zxing = "3.5.3"
 # Aligns the kotlin-stdlib variants CameraX and androidx drag in; see qr/build.gradle.kts.
 kotlin = "1.8.22"
 androidxAnnotation = "1.8.2"
+# The published card / passport / qr the sample app consumes (from mavenLocal).
+read3r = "0.0.1"
 
 # Test
 junit = "4.13.2"
 
 [libraries]
+read3r-card = { module = "com.adkhambek.reader:card", version.ref = "read3r" }
+read3r-passport = { module = "com.adkhambek.reader:passport", version.ref = "read3r" }
+read3r-qr = { module = "com.adkhambek.reader:qr", version.ref = "read3r" }
 androidx-activity = { module = "androidx.activity:activity", version.ref = "androidxActivity" }
 androidx-core = { module = "androidx.core:core", version.ref = "androidxCore" }
 camera-core = { module = "androidx.camera:camera-core", version.ref = "camerax" }
