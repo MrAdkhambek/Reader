@@ -1,6 +1,8 @@
 # Subagent-driven-development scratch: ledgers, task briefs, review packages.
 # Git history is the durable record; this is working state.
 .superpowers/
+# Design specs and plans from those runs: kept locally, not in the repo.
+docs/superpowers/
 
 # Gradle
 .gradle/
