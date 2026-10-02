@@ -47,7 +47,7 @@ final class Apdu {
 			// 61xx: sw2 more bytes are waiting.
 			c = new byte[]{0x00, (byte) 0xC0, 0x00, 0x00, sw2};
 		}
-		throw new IOException("too many chained responses");
+		throw new IllegalStateException("too many chained responses");
 	}
 
 	static int sw(byte[] response) {

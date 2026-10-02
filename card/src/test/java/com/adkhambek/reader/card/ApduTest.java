@@ -39,7 +39,7 @@ public class ApduTest {
 		card.assertExhausted();
 	}
 
-	@Test public void capsChainingAt16Exchanges() {
+	@Test public void capsChainingAt16ExchangesAsAFailureNotALostCard() throws IOException {
 		final int[] calls = {0};
 		final Apdu apdu = new Apdu(command -> {
 			++calls[0];
@@ -47,8 +47,8 @@ public class ApduTest {
 		});
 		try {
 			apdu.send(Replay.hex("00B0000000"));
-			fail("expected IOException");
-		} catch (IOException expected) {
+			fail("expected IllegalStateException");
+		} catch (IllegalStateException expected) {
 		}
 		assertEquals(16, calls[0]);
 	}
