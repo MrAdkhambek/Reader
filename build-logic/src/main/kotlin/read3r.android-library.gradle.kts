@@ -3,7 +3,7 @@ import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 
 /**
- * Shared configuration for every published Android library module (:nfc, :qr).
+ * Shared configuration for every published Android library module (:card, :passport, :qr).
  *
  * Modules keep only what is genuinely theirs: `namespace` and `dependencies`.
  * Their POM coordinates come from each module's own gradle.properties
