@@ -106,30 +106,6 @@ Request `CAMERA` yourself. Without it the view waits; call `start` again once it
 
 To read an ID card's MRZ from its QR code, add `passport` and call `Mrz.isValid` / `Mrz.decode` on `code.text()`.
 
-## Building
-
-```bash
-./gradlew test lint                 # unit tests + lint, all modules
-./gradlew :app:installDebug         # sample app
-./gradlew publishToMavenLocal       # all three libraries → ~/.m2
-```
-
-Tests are plain JUnit — no device, no Robolectric. Card conversations are replayed from scripted transcripts; BAC and Secure Messaging are pinned to the ICAO 9303 Appendix D worked examples. Every transcript is synthetic.
-
-Each library keeps its public API in its root package and its internals in sub-packages by function:
-
-| Library | Sub-packages |
-|---|---|
-| `card` | `iso7816` (APDU/TLV transport), `emv` |
-| `passport` | `iso7816`, `mrz` (public MRZ types), `bac` (BAC and Secure Messaging), `dg` (data groups) |
-| `qr` | `camera` (CameraX + ZXing), `view` (`ScannerOverlayView`) |
-
-Helpers used across sub-packages are public but annotated `@RestrictTo(LIBRARY)`, so lint reports any use from an app. They are not API.
-
-`card` and `passport` each carry their own copy of the same small helpers (`iso7816.Apdu`, `iso7816.Tlv`, `iso7816.Transceiver`, plus `Call`, `Callback`, `Cancellable`, `ReadException`), so neither depends on the other. Keep the copies identical apart from the package line.
-
-Publishing to Maven Central: set `RELEASE_SIGNING_ENABLED=true` and `SONATYPE_HOST=CENTRAL_PORTAL` in `gradle.properties`, put `mavenCentralUsername` / `mavenCentralPassword` / `signing.*` in `~/.gradle/gradle.properties`, then run `./gradlew publishAndReleaseToMavenCentral`.
-
 ## Security
 
 - **PAN and cardholder name** put you in PCI scope if you transmit or store them. The libraries never log them.
