@@ -7,6 +7,8 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * SYNTHETIC transcripts. BAC's cryptography is pinned by BacTest and
@@ -21,7 +23,7 @@ public class PassportReaderTest {
 
 	private static ReadException.Reason reasonOf(Transceiver card) {
 		try {
-			PassportReader.readWith(card, KEY);
+			PassportReader.readWith(card, KEY, 0);
 			fail("expected ReadException");
 			return null;
 		} catch (ReadException e) {
@@ -51,9 +53,38 @@ public class PassportReaderTest {
 
 	@Test public void nullKeyIsAProgrammingError() throws ReadException {
 		try {
-			PassportReader.readWith(new Replay(), null);
+			PassportReader.readWith(new Replay(), null, 0);
 			fail("expected IllegalArgumentException");
 		} catch (IllegalArgumentException expected) {
 		}
+	}
+
+	/** With a phone that supports extended length, EF.ATR/INFO is probed first —
+	 *  unprotected, before the applet is selected — and its absence is harmless. */
+	@Test public void extendedLengthProbeRunsFirstAndToleratesAbsence() {
+		final Replay card = new Replay()
+				.expect("00A4020C022F01").reply("6A82")
+				.expect(SELECT_EMRTD).reply("6A82");
+		try {
+			PassportReader.readWith(card, KEY, 65279);
+			fail("expected ReadException");
+		} catch (ReadException e) {
+			assertEquals(ReadException.Reason.UNSUPPORTED, e.reason());
+		}
+		card.assertExhausted();
+	}
+
+	@Test public void unreadableComReadsEveryOptionalGroup() {
+		assertEquals(Arrays.asList(0x010B, 0x010C, 0x010D, 0x0102), PassportReader.optionalFids(null));
+	}
+
+	@Test public void emptyComReadsEveryOptionalGroup() {
+		assertEquals(Arrays.asList(0x010B, 0x010C, 0x010D, 0x0102),
+				PassportReader.optionalFids(Collections.emptyList()));
+	}
+
+	@Test public void readsOnlyGroupsComLists() {
+		assertEquals(Collections.singletonList(0x0102),
+				PassportReader.optionalFids(Arrays.asList("DG1", "DG2")));
 	}
 }

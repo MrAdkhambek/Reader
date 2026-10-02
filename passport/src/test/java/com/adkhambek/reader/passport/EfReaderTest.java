@@ -64,7 +64,7 @@ public class EfReaderTest {
 
 	@Test public void absentFileIsNullAfterOneSelect() throws Exception {
 		final FakeCard card = new FakeCard();
-		assertNull(new EfReader(card).read(FID_DG2));
+		assertNull(new EfReader(card, 0).read(FID_DG2));
 		assertEquals(1, card.sent.size());
 	}
 
@@ -73,7 +73,7 @@ public class EfReaderTest {
 		final byte[] file = ef(1000);
 		final FakeCard card = new FakeCard().put(FID_DG2, file);
 
-		assertArrayEquals(file, new EfReader(card).read(FID_DG2));
+		assertArrayEquals(file, new EfReader(card, 0).read(FID_DG2));
 		assertEquals(7, card.sent.size());
 		assertEquals("00B0000005", card.sent.get(1));
 		assertEquals("00B00005DF", card.sent.get(2));
@@ -84,6 +84,43 @@ public class EfReaderTest {
 		final byte[] truncated = Arrays.copyOf(ef(1000), 300);
 		final FakeCard card = new FakeCard().put(FID_DG2, truncated);
 
-		assertArrayEquals(truncated, new EfReader(card).read(FID_DG2));
+		assertArrayEquals(truncated, new EfReader(card, 0).read(FID_DG2));
+	}
+
+	/** Limit 4096 → chunk 4096 − 29 = 4067 (0x0FE3): 10004 bytes is a head read + 3 reads. */
+	@Test public void extendedLimitUsesLargeChunks() throws Exception {
+		final byte[] file = ef(10_000);
+		final FakeCard card = new FakeCard().put(FID_DG2, file);
+
+		assertArrayEquals(file, new EfReader(card, 4096).read(FID_DG2));
+		assertEquals(5, card.sent.size());
+		assertEquals("00B00005000FE3", card.sent.get(2));
+	}
+
+	/** A limit near short-form size buys nothing over 223, so stay short form. */
+	@Test public void smallLimitStaysShortForm() throws Exception {
+		final FakeCard card = new FakeCard().put(FID_DG2, ef(1000));
+
+		new EfReader(card, 261).read(FID_DG2);
+		assertEquals("00B00005DF", card.sent.get(2));
+	}
+
+	// --- EF.ATR/INFO: the chip's own limits, tag 7F66 ----------------------
+
+	/** Two INTEGERs: max command (0400), then max response (0800 = 2048). */
+	@Test public void maxResponseFromAtrInfo() {
+		assertEquals(2048, EfReader.maxResponseFrom(Replay.hex("7F66080202040002020800")));
+	}
+
+	@Test public void maxResponseSkipsOtherObjects() {
+		assertEquals(2048, EfReader.maxResponseFrom(Replay.hex("4703000000 7F66080202040002020800")));
+	}
+
+	@Test public void maxResponseIsZeroWhen7F66IsAbsent() {
+		assertEquals(0, EfReader.maxResponseFrom(Replay.hex("4703000000")));
+	}
+
+	@Test public void maxResponseIsZeroWhenMalformed() {
+		assertEquals(0, EfReader.maxResponseFrom(Replay.hex("7F66")));
 	}
 }

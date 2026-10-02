@@ -9,6 +9,8 @@ import android.os.Looper;
 import androidx.annotation.WorkerThread;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -35,6 +37,8 @@ public final class PassportReader {
 	private static final int TIMEOUT_MS = 15000;
 	private static final byte[] SELECT_EMRTD = {
 			0x00, (byte) 0xA4, 0x04, 0x0C, 0x07, (byte) 0xA0, 0x00, 0x00, 0x02, 0x47, 0x10, 0x01};
+	private static final byte[] SELECT_ATR_INFO = {0x00, (byte) 0xA4, 0x02, 0x0C, 0x02, 0x2F, 0x01};
+	private static final byte[] READ_UP_TO_256 = {0x00, (byte) 0xB0, 0x00, 0x00, 0x00};
 
 	static final int FID_COM = 0x011E;
 	static final int FID_DG1 = 0x0101;
@@ -88,7 +92,8 @@ public final class PassportReader {
 		try {
 			isoDep.connect();
 			isoDep.setTimeout(TIMEOUT_MS);
-			return readWith(isoDep::transceive, key);
+			final int max = isoDep.isExtendedLengthApduSupported() ? isoDep.getMaxTransceiveLength() : 0;
+			return readWith(isoDep::transceive, key, max);
 		} catch (IOException e) {
 			throw new ReadException(ReadException.Reason.CARD_LOST, "card lost: " + e.getMessage(), e);
 		} finally {
@@ -100,11 +105,23 @@ public final class PassportReader {
 		}
 	}
 
-	/** The read itself, over any transceiver. Package-private: the test seam. */
-	static Passport readWith(Transceiver transceiver, MrzKey key) throws ReadException {
+	/**
+	 * The read itself, over any transceiver. Package-private: the test seam.
+	 *
+	 * @param maxTransceiveLength the phone's extended-length limit, or 0 if it has none
+	 */
+	static Passport readWith(Transceiver transceiver, MrzKey key, int maxTransceiveLength)
+			throws ReadException {
 		if (key == null) throw new IllegalArgumentException("key is null");
 		try {
 			final Apdu apdu = new Apdu(transceiver);
+			// The phone's limit is not enough: an extended APDU sent inside Secure
+			// Messaging to a chip that rejects it can end the session. Ask the chip
+			// first, unprotected, while a refusal costs nothing.
+			final int maxResponse = (maxTransceiveLength > 0)
+					? Math.min(maxTransceiveLength, probeMaxResponse(apdu))
+					: 0;
+
 			final byte[] selected = apdu.send(SELECT_EMRTD);
 			if (!Apdu.ok(selected)) {
 				throw new ReadException(ReadException.Reason.UNSUPPORTED,
@@ -118,15 +135,19 @@ public final class PassportReader {
 				throw new ReadException(ReadException.Reason.AUTH_FAILED, e.getMessage(), e);
 			}
 			final SecureMessaging sm = new SecureMessaging(bac);
-			final EfReader files = new EfReader(plain -> sm.transceive(apdu, plain));
+			final EfReader files = new EfReader(plain -> sm.transceive(apdu, plain), maxResponse);
 			final Passport.Builder out = new Passport.Builder();
 
+			List<String> present = null;
 			final byte[] com = files.read(FID_COM);
-			if (com != null) out.presentDataGroups = DgParser.parseCom(com);
+			if (com != null) {
+				present = DgParser.parseCom(com);
+				out.presentDataGroups = present;
+			}
 			final byte[] dg1 = files.read(FID_DG1);
 			if (dg1 != null) DgParser.parseDg1(dg1, out);
 
-			for (final int fid : new int[]{FID_DG11, FID_DG12, FID_DG13, FID_DG2}) {
+			for (final int fid : optionalFids(present)) {
 				try {
 					readOptional(files, fid, out);
 				} catch (IOException lost) {
@@ -139,6 +160,28 @@ public final class PassportReader {
 		} catch (RuntimeException e) {
 			throw new ReadException(ReadException.Reason.FAILED, e.toString(), e);
 		}
+	}
+
+	/**
+	 * The optional groups to read, DG2 last. Asking for an absent group costs a
+	 * full secured exchange, and some chips answer it in a way that ends the SM
+	 * session before DG2. Null or empty means EF.COM was unreadable: read all four.
+	 */
+	static List<Integer> optionalFids(List<String> present) {
+		final int[] fids = {FID_DG11, FID_DG12, FID_DG13, FID_DG2};
+		final String[] names = {"DG11", "DG12", "DG13", "DG2"};
+		final List<Integer> out = new ArrayList<>(fids.length);
+		for (int i = 0; i < fids.length; ++i) {
+			if (present == null || present.isEmpty() || present.contains(names[i])) out.add(fids[i]);
+		}
+		return out;
+	}
+
+	/** EF.ATR/INFO (2F01, in the MF) states the chip's APDU limits. 0 if absent or unreadable. */
+	private static int probeMaxResponse(Apdu apdu) throws IOException {
+		if (!Apdu.ok(apdu.send(SELECT_ATR_INFO))) return 0;
+		final byte[] info = apdu.send(READ_UP_TO_256);
+		return Apdu.ok(info) ? EfReader.maxResponseFrom(Apdu.data(info)) : 0;
 	}
 
 	/** An optional group that fails to read or parse is left null. */
