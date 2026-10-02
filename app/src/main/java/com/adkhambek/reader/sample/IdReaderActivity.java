@@ -26,13 +26,13 @@ import android.widget.TextView;
 import com.adkhambek.reader.passport.Callback;
 import com.adkhambek.reader.passport.Cancellable;
 import com.adkhambek.reader.passport.DocumentDetails;
-import com.adkhambek.reader.passport.MrzDocument;
-import com.adkhambek.reader.passport.MrzKey;
 import com.adkhambek.reader.passport.Passport;
 import com.adkhambek.reader.passport.PassportReader;
 import com.adkhambek.reader.passport.PersonalDetails;
 import com.adkhambek.reader.passport.Photo;
 import com.adkhambek.reader.passport.ReadException;
+import com.adkhambek.reader.passport.mrz.MrzDocument;
+import com.adkhambek.reader.passport.mrz.MrzKey;
 
 import java.util.Map;
 

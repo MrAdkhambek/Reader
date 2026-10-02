@@ -16,7 +16,8 @@ import java.util.List;
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public final class Tlv {
-	final int tag;
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public final int tag;
 	@RestrictTo(RestrictTo.Scope.LIBRARY)
 	public final byte[] value;
 
@@ -38,7 +39,8 @@ public final class Tlv {
 	 *
 	 * @throws IllegalArgumentException on truncated or malformed input
 	 */
-	static List<Tlv> parse(byte[] data, boolean descend) {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static List<Tlv> parse(byte[] data, boolean descend) {
 		final List<Tlv> out = new ArrayList<>();
 		parse(data, descend, out);
 		return out;

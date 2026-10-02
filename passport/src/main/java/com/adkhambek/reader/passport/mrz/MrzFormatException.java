@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.passport;
+package com.adkhambek.reader.passport.mrz;
 
 /**
  * The input is not a machine-readable zone this library can decode. Unchecked:

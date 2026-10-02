@@ -1,5 +1,10 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.passport;
+package com.adkhambek.reader.passport.bac;
+
+import androidx.annotation.RestrictTo;
+
+import com.adkhambek.reader.passport.iso7816.Apdu;
+import com.adkhambek.reader.passport.iso7816.Bytes;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -13,12 +18,14 @@ import java.util.Arrays;
  * DO8E = MAC(SSC ‖ padded header ‖ DO87 ‖ DO97). Response: DO87, DO99 (the real
  * status word), DO8E. The SSC is incremented before each MAC, on both sides.
  */
-final class SecureMessaging {
+@RestrictTo(RestrictTo.Scope.LIBRARY)
+public final class SecureMessaging {
 	private final byte[] ksEnc;
 	private final byte[] ksMac;
 	private final byte[] ssc;
 
-	SecureMessaging(Bac bac) {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public SecureMessaging(Bac bac) {
 		this(bac.ksEnc, bac.ksMac, bac.ssc);
 	}
 
@@ -29,7 +36,8 @@ final class SecureMessaging {
 	}
 
 	/** Wrap {@code plain}, send it, return the unwrapped {@code data ‖ SW}. */
-	byte[] transceive(Apdu apdu, byte[] plain) throws IOException {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public byte[] transceive(Apdu apdu, byte[] plain) throws IOException {
 		final byte[] r = apdu.send(wrap(plain));
 		return unwrap(Apdu.data(r), Apdu.sw(r));
 	}
@@ -124,7 +132,8 @@ final class SecureMessaging {
 	}
 
 	/** One-byte tag, BER length (short, 81 or 82 form), value. */
-	static byte[] tlv(int tag, byte[] value) {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static byte[] tlv(int tag, byte[] value) {
 		final int n = value.length;
 		final byte[] len = (n < 0x80) ? new byte[]{(byte) n}
 				: (n <= 0xFF) ? new byte[]{(byte) 0x81, (byte) n}

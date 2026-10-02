@@ -1,5 +1,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.passport;
+package com.adkhambek.reader.passport.mrz;
+
+import androidx.annotation.RestrictTo;
 
 /**
  * The fields of an ICAO 9303 machine-readable zone — immutable.
@@ -73,7 +75,8 @@ public final class MrzDocument {
 	}
 
 	/** Filled by {@link Mrz} and the DG11 parser; not public API. */
-	static final class Builder {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static final class Builder {
 		private String documentType;
 		private String issuingCountry;
 		private String documentNumber;
@@ -108,7 +111,8 @@ public final class MrzDocument {
 		Builder personalNumber(String v) { this.personalNumber = v; return this; }
 
 		/** DG11's 5F10 is a fallback for a blank MRZ field; it must not overwrite DG1. */
-		Builder personalNumberIfAbsent(String v) {
+		@RestrictTo(RestrictTo.Scope.LIBRARY)
+		public Builder personalNumberIfAbsent(String v) {
 			if (this.personalNumber == null) this.personalNumber = v;
 			return this;
 		}
@@ -117,6 +121,7 @@ public final class MrzDocument {
 
 		Builder raw(String v) { this.raw = v; return this; }
 
-		MrzDocument build() { return new MrzDocument(this); }
+		@RestrictTo(RestrictTo.Scope.LIBRARY)
+		public MrzDocument build() { return new MrzDocument(this); }
 	}
 }

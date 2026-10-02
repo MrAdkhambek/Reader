@@ -19,8 +19,8 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
-import com.adkhambek.reader.passport.Mrz;
-import com.adkhambek.reader.passport.MrzDocument;
+import com.adkhambek.reader.passport.mrz.Mrz;
+import com.adkhambek.reader.passport.mrz.MrzDocument;
 import com.adkhambek.reader.qr.QrCode;
 import com.adkhambek.reader.qr.QrScannerView;
 

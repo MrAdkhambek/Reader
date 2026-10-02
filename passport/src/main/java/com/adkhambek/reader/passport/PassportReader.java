@@ -8,6 +8,15 @@ import android.os.Looper;
 
 import androidx.annotation.WorkerThread;
 
+import com.adkhambek.reader.passport.bac.Bac;
+import com.adkhambek.reader.passport.bac.SecureMessaging;
+import com.adkhambek.reader.passport.dg.Dg2;
+import com.adkhambek.reader.passport.dg.DgParser;
+import com.adkhambek.reader.passport.dg.EfReader;
+import com.adkhambek.reader.passport.iso7816.Apdu;
+import com.adkhambek.reader.passport.iso7816.Transceiver;
+import com.adkhambek.reader.passport.mrz.MrzKey;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

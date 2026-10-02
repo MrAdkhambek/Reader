@@ -17,7 +17,8 @@ import java.util.Arrays;
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public final class Apdu {
-	static final int SW_OK = 0x9000;
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static final int SW_OK = 0x9000;
 	private static final int MAX_EXCHANGES = 16;
 	private static final byte[] ERROR = {0x6F, 0x00};
 
@@ -55,7 +56,8 @@ public final class Apdu {
 		throw new IllegalStateException("too many chained responses");
 	}
 
-	static int sw(byte[] response) {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static int sw(byte[] response) {
 		final int n = response.length;
 		return ((response[n - 2] & 0xFF) << 8) | (response[n - 1] & 0xFF);
 	}

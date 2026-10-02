@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.passport;
+package com.adkhambek.reader.passport.iso7816;
 
 import java.util.ArrayDeque;
 import java.util.Arrays;
@@ -16,12 +16,12 @@ import java.util.Deque;
  * <p>Twin of the same file in the other NFC library (card ↔ passport) — keep
  * identical apart from the package line.
  */
-final class Replay implements Transceiver {
+public final class Replay implements Transceiver {
 
 	private final Deque<byte[][]> script = new ArrayDeque<>();
 	private byte[] pending;
 
-	static byte[] hex(String s) {
+	public static byte[] hex(String s) {
 		final String c = s.replaceAll("\\s", "");
 		final byte[] out = new byte[c.length() / 2];
 		for (int i = 0; i < out.length; ++i) {
@@ -30,13 +30,13 @@ final class Replay implements Transceiver {
 		return out;
 	}
 
-	Replay expect(String request) {
+	public Replay expect(String request) {
 		if (pending != null) throw new IllegalStateException("expect() twice without reply()");
 		pending = hex(request);
 		return this;
 	}
 
-	Replay reply(String response) {
+	public Replay reply(String response) {
 		if (pending == null) throw new IllegalStateException("reply() without expect()");
 		script.addLast(new byte[][]{pending, hex(response)});
 		pending = null;
@@ -56,7 +56,7 @@ final class Replay implements Transceiver {
 		return next[1];
 	}
 
-	void assertExhausted() {
+	public void assertExhausted() {
 		if (!script.isEmpty()) {
 			throw new AssertionError(script.size() + " scripted exchange(s) unused, next: "
 					+ hexOf(script.peekFirst()[0]));

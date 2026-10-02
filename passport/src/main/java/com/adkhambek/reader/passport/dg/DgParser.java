@@ -1,5 +1,14 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.passport;
+package com.adkhambek.reader.passport.dg;
+
+import androidx.annotation.RestrictTo;
+
+import com.adkhambek.reader.passport.DocumentDetails;
+import com.adkhambek.reader.passport.Passport;
+import com.adkhambek.reader.passport.PersonalDetails;
+import com.adkhambek.reader.passport.iso7816.Bytes;
+import com.adkhambek.reader.passport.iso7816.Tlv;
+import com.adkhambek.reader.passport.mrz.Mrz;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -7,25 +16,29 @@ import java.util.List;
 import java.util.Locale;
 
 /** Parsers for EF.COM, DG1, DG11, DG12 and DG13. DG2 is {@link Dg2}. */
-final class DgParser {
+@RestrictTo(RestrictTo.Scope.LIBRARY)
+public final class DgParser {
 	private DgParser() {
 	}
 
 	/** DG1: the MRZ, in tag 5F1F. */
-	static void parseDg1(byte[] dg1, Passport.Builder out) {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static void parseDg1(byte[] dg1, Passport.Builder out) {
 		final Tlv mrz = Tlv.find(Tlv.primitives(dg1), 0x5F1F);
 		if (mrz != null) Mrz.decodeInto(new String(mrz.value, StandardCharsets.US_ASCII), out.mrz);
 	}
 
 	/** EF.COM: the tag list (5C) of data groups present. */
-	static List<String> parseCom(byte[] com) {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static List<String> parseCom(byte[] com) {
 		final List<String> out = new ArrayList<>();
 		final Tlv list = Tlv.find(Tlv.primitives(com), 0x5C);
 		if (list != null) for (final byte b : list.value) out.add(dgName(b & 0xFF));
 		return out;
 	}
 
-	static void parseDg11(byte[] dg11, Passport.Builder out) {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static void parseDg11(byte[] dg11, Passport.Builder out) {
 		final List<Tlv> t = Tlv.primitives(dg11);
 		// 5F10 is a fallback for cards that leave the MRZ field blank — never an overwrite.
 		out.mrz.personalNumberIfAbsent(text(t, 0x5F10));
@@ -34,12 +47,14 @@ final class DgParser {
 				text(t, 0x5F13), text(t, 0x5F14));
 	}
 
-	static void parseDg12(byte[] dg12, Passport.Builder out) {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static void parseDg12(byte[] dg12, Passport.Builder out) {
 		final List<Tlv> t = Tlv.primitives(dg12);
 		out.documentDetails = new DocumentDetails(text(t, 0x5F19), date(t, 0x5F26), text(t, 0x5F1B));
 	}
 
-	static void parseDg13(byte[] dg13, Passport.Builder out) {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static void parseDg13(byte[] dg13, Passport.Builder out) {
 		for (final Tlv t : Tlv.primitives(dg13)) {
 			String text = decodeString(t.value);
 			if (looksBinary(text)) text = Bytes.hex(t.value);

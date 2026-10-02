@@ -1,5 +1,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.passport;
+package com.adkhambek.reader.passport.iso7816;
+
+import androidx.annotation.RestrictTo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,9 +14,12 @@ import java.util.List;
  * <p>Twin of the same file in the other NFC library (card ↔ passport) — keep
  * identical apart from the package line.
  */
-final class Tlv {
-	final int tag;
-	final byte[] value;
+@RestrictTo(RestrictTo.Scope.LIBRARY)
+public final class Tlv {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public final int tag;
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public final byte[] value;
 
 	Tlv(int tag, byte[] value) {
 		this.tag = tag;
@@ -22,7 +27,8 @@ final class Tlv {
 	}
 
 	/** Every primitive object in {@code data}, descending into constructed ones. */
-	static List<Tlv> primitives(byte[] data) {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static List<Tlv> primitives(byte[] data) {
 		return parse(data, true);
 	}
 
@@ -33,7 +39,8 @@ final class Tlv {
 	 *
 	 * @throws IllegalArgumentException on truncated or malformed input
 	 */
-	static List<Tlv> parse(byte[] data, boolean descend) {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static List<Tlv> parse(byte[] data, boolean descend) {
 		final List<Tlv> out = new ArrayList<>();
 		parse(data, descend, out);
 		return out;
@@ -71,7 +78,8 @@ final class Tlv {
 	}
 
 	/** Bytes taken by the tag that starts at {@code p}. */
-	static int tagLength(byte[] b, int p) {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static int tagLength(byte[] b, int p) {
 		if ((b[p] & 0x1F) != 0x1F) return 1;
 		int n = 1;
 		while (p + n < b.length) {
@@ -80,12 +88,14 @@ final class Tlv {
 		throw new IllegalArgumentException("truncated tag");
 	}
 
-	static Tlv find(List<Tlv> tlvs, int tag) {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static Tlv find(List<Tlv> tlvs, int tag) {
 		for (final Tlv t : tlvs) if (t.tag == tag) return t;
 		return null;
 	}
 
-	static List<Tlv> findAll(List<Tlv> tlvs, int tag) {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static List<Tlv> findAll(List<Tlv> tlvs, int tag) {
 		final List<Tlv> out = new ArrayList<>();
 		for (final Tlv t : tlvs) if (t.tag == tag) out.add(t);
 		return out;

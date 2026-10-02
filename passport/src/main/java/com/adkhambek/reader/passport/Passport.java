@@ -1,6 +1,10 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 package com.adkhambek.reader.passport;
 
+import androidx.annotation.RestrictTo;
+
+import com.adkhambek.reader.passport.mrz.MrzDocument;
+
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -49,11 +53,16 @@ public final class Passport {
 	}
 
 	/** Accumulator the data-group parsers write into; not public API. */
-	static final class Builder {
-		final MrzDocument.Builder mrz = new MrzDocument.Builder();
-		final Map<String, String> nationalData = new LinkedHashMap<>();
-		PersonalDetails personalDetails;
-		DocumentDetails documentDetails;
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static final class Builder {
+		@RestrictTo(RestrictTo.Scope.LIBRARY)
+		public final MrzDocument.Builder mrz = new MrzDocument.Builder();
+		@RestrictTo(RestrictTo.Scope.LIBRARY)
+		public final Map<String, String> nationalData = new LinkedHashMap<>();
+		@RestrictTo(RestrictTo.Scope.LIBRARY)
+		public PersonalDetails personalDetails;
+		@RestrictTo(RestrictTo.Scope.LIBRARY)
+		public DocumentDetails documentDetails;
 		Photo photo;
 		List<String> presentDataGroups = Collections.emptyList();
 

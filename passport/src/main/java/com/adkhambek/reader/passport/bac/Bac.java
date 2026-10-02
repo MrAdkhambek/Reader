@@ -1,5 +1,10 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.passport;
+package com.adkhambek.reader.passport.bac;
+
+import androidx.annotation.RestrictTo;
+
+import com.adkhambek.reader.passport.iso7816.Apdu;
+import com.adkhambek.reader.passport.iso7816.Bytes;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -26,13 +31,15 @@ import javax.crypto.spec.SecretKeySpec;
  *   <li>{@code SSC = RND.ICC[4:8] ‖ RND.IFD[4:8]}.</li>
  * </ol>
  */
-final class Bac {
+@RestrictTo(RestrictTo.Scope.LIBRARY)
+public final class Bac {
 	final byte[] ksEnc;
 	final byte[] ksMac;
 	final byte[] ssc;
 
 	/** BAC did not complete; the reader reports it as {@code AUTH_FAILED}. */
-	static final class BacException extends Exception {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static final class BacException extends Exception {
 		BacException(String message) {
 			super(message);
 		}
@@ -44,7 +51,8 @@ final class Bac {
 		this.ssc = ssc;
 	}
 
-	static String mrzInfo(String docNumber, String dob, String expiry) {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static String mrzInfo(String docNumber, String dob, String expiry) {
 		// Locale.ROOT: Turkish 'i' → 'İ' would break the check digit.
 		final StringBuilder doc = new StringBuilder(docNumber.toUpperCase(Locale.ROOT));
 		while (doc.length() < 9) doc.append('<');
@@ -81,7 +89,8 @@ final class Bac {
 		return k;
 	}
 
-	static Bac mutualAuthenticate(Apdu apdu, String mrzInfo) throws BacException, IOException {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static Bac mutualAuthenticate(Apdu apdu, String mrzInfo) throws BacException, IOException {
 		final byte[] seed = kSeed(mrzInfo);
 		final byte[] kEnc = deriveKey(seed, 1);
 		final byte[] kMac = deriveKey(seed, 2);

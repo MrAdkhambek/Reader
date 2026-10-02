@@ -1,11 +1,13 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.passport;
+package com.adkhambek.reader.passport.bac;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-
 import org.junit.Test;
+
+import com.adkhambek.reader.passport.iso7816.Apdu;
+import com.adkhambek.reader.passport.iso7816.Bytes;
 
 /**
  * Vectors are from the ICAO 9303 Part 11 BAC worked example

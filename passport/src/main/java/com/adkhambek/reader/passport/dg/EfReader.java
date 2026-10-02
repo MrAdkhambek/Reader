@@ -1,5 +1,11 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.passport;
+package com.adkhambek.reader.passport.dg;
+
+import androidx.annotation.RestrictTo;
+
+import com.adkhambek.reader.passport.iso7816.Apdu;
+import com.adkhambek.reader.passport.iso7816.Tlv;
+import com.adkhambek.reader.passport.iso7816.Transceiver;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -7,7 +13,8 @@ import java.util.List;
 import java.util.Locale;
 
 /** Reads one elementary file: SELECT by FID, then READ BINARY in chunks. */
-final class EfReader {
+@RestrictTo(RestrictTo.Scope.LIBRARY)
+public final class EfReader {
 	/** 223 data bytes plus SM overhead fit a 256-byte short response. */
 	static final int SHORT_CHUNK = 0xDF;
 	/** Tag + up to 0x83 + 3 length bytes: enough to size any file up to 16 MB. */
@@ -23,7 +30,8 @@ final class EfReader {
 	 * @param sm                plain APDU in, unwrapped {@code data ‖ SW} out
 	 * @param maxResponseLength largest response both phone and chip accept; 0 = short form only
 	 */
-	EfReader(Transceiver sm, int maxResponseLength) {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public EfReader(Transceiver sm, int maxResponseLength) {
 		this.sm = sm;
 		final int extendedChunk = Math.min(maxResponseLength, 65536) - SM_OVERHEAD;
 		// Go extended only when it buys more than a short Le can express.
@@ -32,7 +40,8 @@ final class EfReader {
 	}
 
 	/** @return the whole file, or null if the chip says it does not exist (6A82) */
-	byte[] read(int fid) throws IOException {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public byte[] read(int fid) throws IOException {
 		final byte[] sel = sm.transceive(
 				new byte[]{0x00, (byte) 0xA4, 0x02, 0x0C, 0x02, (byte) (fid >> 8), (byte) fid});
 		final int sw = Apdu.sw(sel);
@@ -78,7 +87,8 @@ final class EfReader {
 	 *
 	 * @return the limit, or 0 if 7F66 is absent or malformed
 	 */
-	static int maxResponseFrom(byte[] atrInfo) {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static int maxResponseFrom(byte[] atrInfo) {
 		try {
 			for (final Tlv t : Tlv.parse(atrInfo, false)) {
 				if (t.tag != 0x7F66) continue;

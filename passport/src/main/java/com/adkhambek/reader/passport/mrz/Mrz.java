@@ -1,5 +1,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.passport;
+package com.adkhambek.reader.passport.mrz;
+
+import androidx.annotation.RestrictTo;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -50,7 +52,8 @@ public final class Mrz {
 	}
 
 	/** Decode into an existing builder; the eMRTD reader merges DG1 with other groups. */
-	static void decodeInto(String mrz, MrzDocument.Builder out) {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static void decodeInto(String mrz, MrzDocument.Builder out) {
 		decodeInto(mrz, out, Calendar.getInstance().get(Calendar.YEAR));
 	}
 

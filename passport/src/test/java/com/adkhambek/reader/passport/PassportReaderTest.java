@@ -6,6 +6,10 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
+import com.adkhambek.reader.passport.iso7816.Replay;
+import com.adkhambek.reader.passport.iso7816.Transceiver;
+import com.adkhambek.reader.passport.mrz.MrzKey;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;

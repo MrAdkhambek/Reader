@@ -1,5 +1,10 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.passport;
+package com.adkhambek.reader.passport.dg;
+
+import androidx.annotation.RestrictTo;
+
+import com.adkhambek.reader.passport.PhotoFormat;
+import com.adkhambek.reader.passport.iso7816.Tlv;
 
 import java.util.Arrays;
 import java.util.List;
@@ -8,13 +13,17 @@ import java.util.List;
  * DG2 — the facial image, inside a biometric data block (5F2E, or 7F2E). Found
  * by its JPEG / JPEG 2000 magic bytes rather than by parsing CBEFF headers.
  */
-final class Dg2 {
+@RestrictTo(RestrictTo.Scope.LIBRARY)
+public final class Dg2 {
 	private Dg2() {
 	}
 
-	static final class Image {
-		final PhotoFormat format;
-		final byte[] data;
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static final class Image {
+		@RestrictTo(RestrictTo.Scope.LIBRARY)
+		public final PhotoFormat format;
+		@RestrictTo(RestrictTo.Scope.LIBRARY)
+		public final byte[] data;
 
 		Image(PhotoFormat format, byte[] data) {
 			this.format = format;
@@ -22,7 +31,8 @@ final class Dg2 {
 		}
 	}
 
-	static Image extract(byte[] dg2) {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static Image extract(byte[] dg2) {
 		byte[] data = dg2;
 		try {
 			final List<Tlv> tlvs = Tlv.primitives(dg2);

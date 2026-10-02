@@ -1,11 +1,14 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.passport;
+package com.adkhambek.reader.passport.bac;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+
+import com.adkhambek.reader.passport.iso7816.Bytes;
+import com.adkhambek.reader.passport.iso7816.Replay;
 
 /** D.4 tests: ICAO 9303-11 Appendix D.4, Secure Messaging after the D.3 BAC example. */
 public class SecureMessagingTest {
