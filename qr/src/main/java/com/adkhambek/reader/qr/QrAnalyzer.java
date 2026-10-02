@@ -51,6 +51,7 @@ final class QrAnalyzer implements ImageAnalysis.Analyzer {
 		done.set(false);
 	}
 
+	// ImageProxy.getImage() is @ExperimentalGetImage; we only read the YUV planes while the proxy is open.
 	@SuppressLint("UnsafeOptInUsageError")
 	@Override
 	public void analyze(@NonNull ImageProxy image) {

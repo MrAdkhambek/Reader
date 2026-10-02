@@ -86,7 +86,9 @@ final class QrScanner {
 		final Preview preview = new Preview.Builder().build();
 		preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
+		final int gen = startGen;
 		analyzer = new QrAnalyzer(code -> main.post(() -> {
+			if (isStale(shutDown, gen, startGen)) return;
 			final Sink s = sink;
 			if (s != null) s.onCode(code);
 		}));
@@ -97,6 +99,11 @@ final class QrScanner {
 
 		provider.unbindAll();
 		provider.bindToLifecycle(lifecycle, CameraSelector.DEFAULT_BACK_CAMERA, preview, analysis);
+	}
+
+	/** True when a result decoded under {@code gen} must be dropped: stop()/start()/shutdown() ran since. */
+	static boolean isStale(boolean shutDown, int gen, int currentGen) {
+		return shutDown || gen != currentGen;
 	}
 
 	void stop() {
