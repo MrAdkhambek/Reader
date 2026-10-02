@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId = "com.adkhambek.reader.sample"
-        versionCode = 16
+        versionCode = 17
         // Single source of truth with the published library version.
         versionName = providers.gradleProperty("VERSION_NAME").get()
     }
@@ -50,10 +50,9 @@ android {
 }
 
 dependencies {
-    implementation(project(":common"))
-    implementation(project(":nfc"))
-    implementation(project(":qr"))
+    implementation(project(":card"))
     implementation(project(":passport"))
+    implementation(project(":qr"))
 
     // ComponentActivity = the minimum AndroidX dep needed for CameraX's LifecycleOwner.
     implementation(libs.androidx.activity)

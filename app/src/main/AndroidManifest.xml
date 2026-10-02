@@ -30,16 +30,8 @@
         <activity
             android:name="com.adkhambek.reader.sample.BankCardActivity"
             android:configChanges="orientation|screenSize"
-            android:exported="true"
-            android:label="@string/menu_bank"
-            android:launchMode="singleTask">
-            <intent-filter>
-                <action android:name="android.nfc.action.TECH_DISCOVERED" />
-            </intent-filter>
-            <meta-data
-                android:name="android.nfc.action.TECH_DISCOVERED"
-                android:resource="@xml/nfc_tech_filter" />
-        </activity>
+            android:exported="false"
+            android:label="@string/menu_bank" />
 
         <activity
             android:name="com.adkhambek.reader.sample.IdInputActivity"
