@@ -74,6 +74,11 @@ public final class CardReader {
 			return readWith(Bytes.hex(tag.getId()), isoDep::transceive);
 		} catch (IOException e) {
 			throw new ReadException(ReadException.Reason.CARD_LOST, "card lost: " + e.getMessage(), e);
+		} catch (SecurityException e) {
+			// A stale tag on Android 13+. Not e.toString(): keep the tag UID out of the message.
+			throw new ReadException(ReadException.Reason.CARD_LOST, "tag is no longer valid", e);
+		} catch (RuntimeException e) {
+			throw new ReadException(ReadException.Reason.FAILED, e.getClass().getSimpleName(), e);
 		} finally {
 			try {
 				isoDep.close();
