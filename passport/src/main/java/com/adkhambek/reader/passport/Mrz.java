@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 package com.adkhambek.reader.passport;
 
+import java.util.Calendar;
 import java.util.Locale;
 
 /**
@@ -50,12 +51,17 @@ public final class Mrz {
 
 	/** Decode into an existing builder; the eMRTD reader merges DG1 with other groups. */
 	static void decodeInto(String mrz, MrzDocument.Builder out) {
+		decodeInto(mrz, out, Calendar.getInstance().get(Calendar.YEAR));
+	}
+
+	/** As above, with "now" injected: the century of a birth date pivots on it. */
+	static void decodeInto(String mrz, MrzDocument.Builder out, int currentYear) {
 		final String m = compact(mrz);
 		out.raw(m);
 		switch (m.length()) {
-			case 90: decodeTd1(m, out); break;
-			case 72: decodeTd2(m, out); break;
-			case 88: decodeTd3(m, out); break;
+			case 90: decodeTd1(m, out, currentYear); break;
+			case 72: decodeTd2(m, out, currentYear); break;
+			case 88: decodeTd3(m, out, currentYear); break;
 			default: // not an MRZ: leave everything but raw unset
 		}
 	}
@@ -112,7 +118,7 @@ public final class Mrz {
 		return expect == (ck - '0');
 	}
 
-	private static void decodeTd1(String m, MrzDocument.Builder out) {
+	private static void decodeTd1(String m, MrzDocument.Builder out, int currentYear) {
 		final String l1 = m.substring(0, 30);
 		final String l2 = m.substring(30, 60);
 		final String l3 = m.substring(60, 90);
@@ -125,14 +131,14 @@ public final class Mrz {
 				.firstName(names[1])
 				.sex(decodeSex(l2.charAt(7)))
 				.nationality(clean(l2.substring(15, 18)))
-				.dateOfBirth(formatDate(l2.substring(0, 6), false))
-				.dateOfExpiry(formatDate(l2.substring(8, 14), true));
+				.dateOfBirth(formatDate(l2.substring(0, 6), false, currentYear))
+				.dateOfExpiry(formatDate(l2.substring(8, 14), true, currentYear));
 
 		final String optional1 = clean(l1.substring(15, 30));
 		if (!optional1.isEmpty()) out.optionalData(optional1);
 	}
 
-	private static void decodeTd2(String m, MrzDocument.Builder out) {
+	private static void decodeTd2(String m, MrzDocument.Builder out, int currentYear) {
 		final String l1 = m.substring(0, 36);
 		final String l2 = m.substring(36, 72);
 		final String[] names = splitName(l1.substring(5, 36));
@@ -144,11 +150,11 @@ public final class Mrz {
 				.firstName(names[1])
 				.sex(decodeSex(l2.charAt(20)))
 				.nationality(clean(l2.substring(10, 13)))
-				.dateOfBirth(formatDate(l2.substring(13, 19), false))
-				.dateOfExpiry(formatDate(l2.substring(21, 27), true));
+				.dateOfBirth(formatDate(l2.substring(13, 19), false, currentYear))
+				.dateOfExpiry(formatDate(l2.substring(21, 27), true, currentYear));
 	}
 
-	private static void decodeTd3(String m, MrzDocument.Builder out) {
+	private static void decodeTd3(String m, MrzDocument.Builder out, int currentYear) {
 		final String l1 = m.substring(0, 44);
 		final String l2 = m.substring(44, 88);
 		final String[] names = splitName(l1.substring(5, 44));
@@ -160,8 +166,8 @@ public final class Mrz {
 				.firstName(names[1])
 				.sex(decodeSex(l2.charAt(20)))
 				.nationality(clean(l2.substring(10, 13)))
-				.dateOfBirth(formatDate(l2.substring(13, 19), false))
-				.dateOfExpiry(formatDate(l2.substring(21, 27), true));
+				.dateOfBirth(formatDate(l2.substring(13, 19), false, currentYear))
+				.dateOfExpiry(formatDate(l2.substring(21, 27), true, currentYear));
 
 		final String personalNr = clean(l2.substring(28, 42));
 		if (!personalNr.isEmpty()) out.personalNumber(personalNr);
@@ -182,8 +188,8 @@ public final class Mrz {
 		}
 	}
 
-	/** {@code YYMMDD} → {@code YYYY-MM-DD}. Birth years ≥ 50 land in the 1900s; expiry always 2000s. */
-	private static String formatDate(String yymmdd, boolean isExpiry) {
+	/** {@code YYMMDD} → {@code YYYY-MM-DD}. A birth year after the current two-digit year is in the 1900s; expiry always 2000s. */
+	private static String formatDate(String yymmdd, boolean isExpiry, int currentYear) {
 		if (yymmdd.length() != 6) return yymmdd;
 		try {
 			final int yy = Integer.parseInt(yymmdd.substring(0, 2));
@@ -191,7 +197,7 @@ public final class Mrz {
 			final int dd = Integer.parseInt(yymmdd.substring(4, 6));
 			// Reject impossible months/days rather than emitting "1974-99-99".
 			if (mm < 1 || mm > 12 || dd < 1 || dd > 31) return yymmdd;
-			final int yyyy = (!isExpiry && yy >= 50) ? yy + 1900 : yy + 2000;
+			final int yyyy = (!isExpiry && yy > currentYear % 100) ? yy + 1900 : yy + 2000;
 			return String.format(Locale.ROOT, "%04d-%02d-%02d", yyyy, mm, dd);
 		} catch (NumberFormatException e) {
 			return yymmdd;

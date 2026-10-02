@@ -184,4 +184,27 @@ public class MrzTest {
 		cs[index] = (cs[index] == '0') ? '1' : '0';
 		return new String(cs);
 	}
+
+	private static final String TD3_DOB_PREFIX = "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<L898902C36UTO";
+
+	private static String dob(String yymmdd, int currentYear) {
+		final String mrz = TD3_DOB_PREFIX + yymmdd + "2F1204159ZE184226B<<<<<10";
+		final MrzDocument.Builder b = new MrzDocument.Builder();
+		Mrz.decodeInto(mrz, b, currentYear);
+		return b.build().dateOfBirth();
+	}
+
+	/** Review I3: a holder born in 1945 must not decode as 2045. */
+	@Test public void dob1945DecodesIn1900s() {
+		assertEquals("1945-08-12", dob("450812", 2026));
+	}
+
+	@Test public void dob2010DecodesIn2000s() {
+		assertEquals("2010-08-12", dob("100812", 2026));
+	}
+
+	@Test public void dobPivotsOnCurrentYear() {
+		assertEquals("2026-08-12", dob("260812", 2026));
+		assertEquals("1927-08-12", dob("270812", 2026));
+	}
 }
