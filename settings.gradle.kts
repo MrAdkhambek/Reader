@@ -17,6 +17,7 @@ dependencyResolutionManagement {
 rootProject.name = "Read3r"
 include(
     ":app",
+    ":card",
     ":common",
     ":iso7816",
     ":nfc",
