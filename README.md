@@ -4,13 +4,19 @@
 
 <h1 align="center">Read3r</h1>
 
+<p align="center">
+  <a href="https://central.sonatype.com/artifact/com.adkhambek.reader/card"><img src="https://img.shields.io/maven-central/v/com.adkhambek.reader/card.svg?label=card" alt="card on Maven Central"></a>
+  <a href="https://central.sonatype.com/artifact/com.adkhambek.reader/passport"><img src="https://img.shields.io/maven-central/v/com.adkhambek.reader/passport.svg?label=passport" alt="passport on Maven Central"></a>
+  <a href="https://central.sonatype.com/artifact/com.adkhambek.reader/qr"><img src="https://img.shields.io/maven-central/v/com.adkhambek.reader/qr.svg?label=qr" alt="qr on Maven Central"></a>
+</p>
+
 Three independent Android libraries: read contactless **bank cards**, ICAO 9303 **passports and ID cards**, and **QR codes**. Each is plain Java, and none depends on another — add only what you use.
 
 | Artifact | Reads | Depends on |
 |---|---|---|
-| `com.adkhambek.reader:card:3.0.0` | EMV bank cards over NFC | androidx.annotation |
-| `com.adkhambek.reader:passport:3.0.0` | ePassports / eMRTD ID cards over NFC, MRZ text | androidx.annotation |
-| `com.adkhambek.reader:qr:3.0.0` | QR codes with the camera | CameraX, ZXing, lifecycle-common, androidx.annotation, the kotlin-bom platform |
+| `com.adkhambek.reader:card:0.0.1` | EMV bank cards over NFC | androidx.annotation |
+| `com.adkhambek.reader:passport:0.0.1` | ePassports / eMRTD ID cards over NFC, MRZ text | androidx.annotation |
+| `com.adkhambek.reader:qr:0.0.1` | QR codes with the camera | CameraX, ZXing, lifecycle-common, androidx.annotation, the kotlin-bom platform |
 
 `minSdk` 21, Java 17. Apache 2.0.
 

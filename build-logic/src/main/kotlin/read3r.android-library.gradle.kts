@@ -50,12 +50,13 @@ extensions.configure<LibraryExtension> {
 }
 
 extensions.configure<MavenPublishBaseExtension> {
-    // AAR + sources jar; no Javadoc jar (no Kotlin/Dokka here, nothing to generate).
+    // AAR + sources jar + javadoc jar. Maven Central rejects a deployment
+    // without a javadoc jar; AGP generates it from the Java sources.
     configure(
         AndroidSingleVariantLibrary(
             variant = "release",
             sourcesJar = true,
-            publishJavadocJar = false,
+            publishJavadocJar = true,
         )
     )
 }

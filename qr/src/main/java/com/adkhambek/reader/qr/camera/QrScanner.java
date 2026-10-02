@@ -23,7 +23,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * CameraX binding behind {@link QrScannerView}: a preview use case plus an
+ * CameraX binding behind {@link com.adkhambek.reader.qr.QrScannerView}: a preview use case plus an
  * analysis use case running {@link QrAnalyzer}. Everything except analysis
  * runs on the main thread, and results are posted there.
  */
