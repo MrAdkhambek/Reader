@@ -11,7 +11,7 @@ targetSdk = "34"
 # Runtime dependencies
 androidxActivity = "1.8.2"
 androidxCore = "1.13.1"
-camerax = "1.3.4"
+camerax = "1.4.2"
 lifecycle = "2.7.0"
 zxing = "3.5.3"
 # Aligns the kotlin-stdlib variants CameraX and androidx drag in; see qr/build.gradle.kts.
