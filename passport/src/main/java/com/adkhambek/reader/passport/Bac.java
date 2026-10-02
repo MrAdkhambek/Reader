@@ -91,6 +91,7 @@ final class Bac {
 			throw new BacException(String.format("GET CHALLENGE SW=%04X", Apdu.sw(challenge)));
 		}
 		final byte[] rndIcc = Apdu.data(challenge);
+		if (rndIcc.length != 8) throw new BacException("GET CHALLENGE returned a bad length");
 
 		final SecureRandom random = new SecureRandom();
 		final byte[] rndIfd = new byte[8];

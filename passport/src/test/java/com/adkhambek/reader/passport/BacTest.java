@@ -86,4 +86,14 @@ public class BacTest {
 		assertEquals(16, padded.length);
 		assertEquals((byte) 0x80, padded[8]);
 	}
+
+	/** Review M1: a GET CHALLENGE answer that is not 8 bytes is a BAC failure. */
+	@Test public void mutualAuthenticate_rejectsShortChallenge() throws java.io.IOException {
+		final Apdu apdu = new Apdu(c -> hex("0102030405 9000"));
+		try {
+			Bac.mutualAuthenticate(apdu, Bac.mrzInfo(DOC, DOB, EXP));
+			org.junit.Assert.fail("expected BacException");
+		} catch (Bac.BacException expected) {
+		}
+	}
 }
