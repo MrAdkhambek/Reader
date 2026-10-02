@@ -116,6 +116,8 @@ public final class IdReaderActivity extends Activity implements NfcAdapter.Reade
 	public void onTagDiscovered(Tag tag) {
 		runOnUiThread(() -> {
 			if (pending != null) pending.cancel();
+			recyclePhoto();
+			photo.setVisibility(View.GONE);
 			output.setText(R.string.id_reading);
 			pending = reader.read(tag, key, new Callback<Passport>() {
 				@Override
