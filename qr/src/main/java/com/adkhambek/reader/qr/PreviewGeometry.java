@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.qr.view;
+package com.adkhambek.reader.qr;
 
 /**
  * The camera-preview coordinate maths, kept free of any Android type.

@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.qr.view;
+package com.adkhambek.reader.qr;
 
 import android.content.Context;
 import android.graphics.Canvas;

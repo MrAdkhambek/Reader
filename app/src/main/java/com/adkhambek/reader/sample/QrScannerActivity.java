@@ -1,14 +1,13 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 package com.adkhambek.reader.sample;
 
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 import android.Manifest;
-import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -17,22 +16,25 @@ import android.widget.Toast;
 import androidx.activity.ComponentActivity;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
-import com.adkhambek.reader.common.mrz.IdCard;
-import com.adkhambek.reader.qr.id.QrIdResult;
-import com.adkhambek.reader.qr.id.QrIdScannerView;
+import com.adkhambek.reader.passport.Mrz;
+import com.adkhambek.reader.passport.MrzDocument;
+import com.adkhambek.reader.qr.QrCode;
+import com.adkhambek.reader.qr.QrScannerView;
 
-public final class QrScannerActivity extends ComponentActivity {
+public final class QrScannerActivity extends ComponentActivity implements QrScannerView.Listener {
 
-	private QrIdScannerView qr;
+	private QrScannerView qr;
 	private TextView output;
 
 	private final ActivityResultLauncher<String> permissionLauncher = registerForActivityResult(
 			new ActivityResultContracts.RequestPermission(),
 			granted -> {
-				if (granted) qr.start(this);
-				else {
+				if (granted) {
+					qr.start(this, this);
+				} else {
 					output.setText(R.string.qr_permission_needed);
 					Toast.makeText(this, R.string.qr_permission_needed, Toast.LENGTH_LONG).show();
 				}
@@ -45,10 +47,8 @@ public final class QrScannerActivity extends ComponentActivity {
 		final LinearLayout root = new LinearLayout(this);
 		root.setOrientation(LinearLayout.VERTICAL);
 
-		qr = new QrIdScannerView(this);
+		qr = new QrScannerView(this);
 		qr.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, 0, 1f));
-		qr.setLifecycleOwner(this);
-		qr.setListener(this::renderResult);
 		root.addView(qr);
 
 		output = new TextView(this);
@@ -58,45 +58,50 @@ public final class QrScannerActivity extends ComponentActivity {
 		output.setPadding(32, 32, 32, 32);
 		output.setText(R.string.qr_prompt);
 		final ScrollView outputScroll = new ScrollView(this);
-		outputScroll.setLayoutParams(new LinearLayout.LayoutParams(
-				MATCH_PARENT, 0, 1f));
+		outputScroll.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, 0, 1f));
 		outputScroll.addView(output);
 		root.addView(outputScroll);
 
 		setContentView(root);
 
-		if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-				!= PackageManager.PERMISSION_GRANTED) {
+		qr.start(this, this);
+		if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PERMISSION_GRANTED) {
 			permissionLauncher.launch(Manifest.permission.CAMERA);
 		}
-		// On grant the lifecycle observer takes over; we don't need to start manually.
 	}
 
-	private void renderResult(QrIdResult result) {
-		if (result.isMrz()) {
-			output.setText(renderIdCard(result.mrz));
-		} else {
-			output.setText(getString(R.string.qr_raw_prefix, result.text));
-		}
+	@Override
+	public void onScanned(@NonNull QrCode code) {
+		// An ID card's QR may carry its MRZ. Check digits first: a random payload
+		// of the right length would otherwise decode into plausible-looking fields.
+		final String text = code.text();
+		output.setText(Mrz.isValid(text)
+				? render(Mrz.decode(text))
+				: getString(R.string.qr_raw_prefix, text));
 	}
 
-	private static String renderIdCard(IdCard c) {
+	@Override
+	public void onError(@NonNull Throwable t) {
+		output.setText(getString(R.string.error_prefix, String.valueOf(t.getMessage())));
+	}
+
+	private static String render(MrzDocument d) {
 		final StringBuilder sb = new StringBuilder();
-		line(sb, "Document type", c.documentType());
-		line(sb, "Issuing country", c.issuingCountry());
-		line(sb, "Document number", c.documentNumber());
-		line(sb, "Last name", c.lastName());
-		line(sb, "First name", c.firstName());
-		line(sb, "Sex", c.sex());
-		line(sb, "Nationality", c.nationality());
-		line(sb, "Date of birth", c.dateOfBirth());
-		line(sb, "Date of expiry", c.dateOfExpiry());
-		line(sb, "Personal number", c.personalNumber());
-		line(sb, "Optional data", c.optionalData());
+		line(sb, "Document type", d.documentType());
+		line(sb, "Issuing country", d.issuingCountry());
+		line(sb, "Document number", d.documentNumber());
+		line(sb, "Last name", d.lastName());
+		line(sb, "First name", d.firstName());
+		line(sb, "Sex", d.sex());
+		line(sb, "Nationality", d.nationality());
+		line(sb, "Date of birth", d.dateOfBirth());
+		line(sb, "Date of expiry", d.dateOfExpiry());
+		line(sb, "Personal number", d.personalNumber());
+		line(sb, "Optional data", d.optionalData());
 		return sb.toString();
 	}
 
-	private static void line(StringBuilder sb, String label, String value) {
+	static void line(StringBuilder sb, String label, String value) {
 		if (value == null || value.isEmpty()) return;
 		sb.append(label);
 		for (int i = label.length(); i < 18; ++i) sb.append(' ');

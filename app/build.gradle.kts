@@ -53,6 +53,7 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":nfc"))
     implementation(project(":qr"))
+    implementation(project(":passport"))
 
     // ComponentActivity = the minimum AndroidX dep needed for CameraX's LifecycleOwner.
     implementation(libs.androidx.activity)

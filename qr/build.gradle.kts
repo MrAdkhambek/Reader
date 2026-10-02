@@ -7,8 +7,6 @@ android {
 }
 
 dependencies {
-    api(project(":common"))
-
     // Align every kotlin-stdlib variant on the consumer's classpath. CameraX 1.3
     // pulls kotlin-stdlib-jdk7/jdk8:1.6.21 while any modern androidx artifact
     // pulls kotlin-stdlib:1.8.x — 1.8 folded the jdk7/jdk8 classes into the base
@@ -22,14 +20,14 @@ dependencies {
 
     // api, not implementation: these types are on the public surface —
     // QrScannerView.getPreviewView() returns a PreviewView and
-    // setLifecycleOwner() takes a LifecycleOwner.
+    // start() takes a LifecycleOwner.
     api(libs.camera.core)
     api(libs.camera.camera2)
     api(libs.camera.lifecycle)
     api(libs.camera.view)
     api(libs.lifecycle.common)
 
-    // Internal only — ScanResult carries float[]/int, never a ZXing type.
+    // Internal only — QrCode carries float[]/int, never a ZXing type.
     implementation(libs.androidx.core)
     implementation(libs.zxing.core)
 }
