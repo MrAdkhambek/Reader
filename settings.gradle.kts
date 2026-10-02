@@ -21,5 +21,6 @@ include(
     ":common",
     ":iso7816",
     ":nfc",
+    ":passport",
     ":qr",
 )
