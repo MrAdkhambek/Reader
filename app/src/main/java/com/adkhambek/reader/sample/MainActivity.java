@@ -32,20 +32,17 @@ public final class MainActivity extends Activity {
 
 		final Button bank = new Button(this);
 		bank.setText(R.string.menu_bank);
-		bank.setOnClickListener(v ->
-				startActivity(new Intent(this, BankCardActivity.class)));
+		bank.setOnClickListener(v -> startActivity(new Intent(this, BankCardActivity.class)));
 		root.addView(bank);
 
 		final Button id = new Button(this);
 		id.setText(R.string.menu_id);
-		id.setOnClickListener(v ->
-				startActivity(new Intent(this, IdInputActivity.class)));
+		id.setOnClickListener(v -> startActivity(new Intent(this, IdInputActivity.class)));
 		root.addView(id);
 
 		final Button qr = new Button(this);
 		qr.setText(R.string.menu_qr);
-		qr.setOnClickListener(v ->
-				startActivity(new Intent(this, QrScannerActivity.class)));
+		qr.setOnClickListener(v -> startActivity(new Intent(this, QrScannerActivity.class)));
 		root.addView(qr);
 
 		setContentView(root);

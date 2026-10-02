@@ -51,18 +51,15 @@ public final class Dg2 {
 	private static Image scanForImage(byte[] d) {
 		for (int i = 0; i < d.length; ++i) {
 			// JPEG SOI: FF D8 FF
-			if (i + 2 < d.length && (d[i] & 0xFF) == 0xFF && (d[i + 1] & 0xFF) == 0xD8
-					&& (d[i + 2] & 0xFF) == 0xFF) {
+			if (i + 2 < d.length && (d[i] & 0xFF) == 0xFF && (d[i + 1] & 0xFF) == 0xD8 && (d[i + 2] & 0xFF) == 0xFF) {
 				return new Image(PhotoFormat.JPEG, Arrays.copyOfRange(d, i, d.length));
 			}
 			// JP2 signature box: 00 00 00 0C 6A 50
-			if (i + 5 < d.length && d[i] == 0x00 && d[i + 1] == 0x00 && d[i + 2] == 0x00
-					&& d[i + 3] == 0x0C && (d[i + 4] & 0xFF) == 0x6A && (d[i + 5] & 0xFF) == 0x50) {
+			if (i + 5 < d.length && d[i] == 0x00 && d[i + 1] == 0x00 && d[i + 2] == 0x00 && d[i + 3] == 0x0C && (d[i + 4] & 0xFF) == 0x6A && (d[i + 5] & 0xFF) == 0x50) {
 				return new Image(PhotoFormat.JP2, Arrays.copyOfRange(d, i, d.length));
 			}
 			// JP2 codestream: FF 4F FF 51
-			if (i + 3 < d.length && (d[i] & 0xFF) == 0xFF && (d[i + 1] & 0xFF) == 0x4F
-					&& (d[i + 2] & 0xFF) == 0xFF && (d[i + 3] & 0xFF) == 0x51) {
+			if (i + 3 < d.length && (d[i] & 0xFF) == 0xFF && (d[i + 1] & 0xFF) == 0x4F && (d[i + 2] & 0xFF) == 0xFF && (d[i + 3] & 0xFF) == 0x51) {
 				return new Image(PhotoFormat.JP2, Arrays.copyOfRange(d, i, d.length));
 			}
 		}

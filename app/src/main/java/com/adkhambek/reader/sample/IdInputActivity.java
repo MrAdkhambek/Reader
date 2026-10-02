@@ -1,18 +1,21 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 package com.adkhambek.reader.sample;
 
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
-
-import java.util.Locale;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Locale;
 
 /** Collects the three MRZ fields needed for BAC and hands off to {@link IdReaderActivity}. */
 public final class IdInputActivity extends Activity {
@@ -55,8 +58,7 @@ public final class IdInputActivity extends Activity {
 
 		final Button start = new Button(this);
 		start.setText(R.string.id_read);
-		final LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-				LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		final LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
 		lp.topMargin = 64;
 		start.setLayoutParams(lp);
 		start.setOnClickListener(v -> {
@@ -74,8 +76,8 @@ public final class IdInputActivity extends Activity {
 			i.putExtra(K_EXP, expStr);
 			startActivity(i);
 		});
-		root.addView(start);
 
+		root.addView(start);
 		setContentView(root);
 	}
 

@@ -42,8 +42,7 @@ public final class EfReader {
 	/** @return the whole file, or null if the chip says it does not exist (6A82) */
 	@RestrictTo(RestrictTo.Scope.LIBRARY)
 	public byte[] read(int fid) throws IOException {
-		final byte[] sel = sm.transceive(
-				new byte[]{0x00, (byte) 0xA4, 0x02, 0x0C, 0x02, (byte) (fid >> 8), (byte) fid});
+		final byte[] sel = sm.transceive(new byte[]{0x00, (byte) 0xA4, 0x02, 0x0C, 0x02, (byte) (fid >> 8), (byte) fid});
 		final int sw = Apdu.sw(sel);
 		if (sw == 0x6A82) return null;
 		if (sw != Apdu.SW_OK) {

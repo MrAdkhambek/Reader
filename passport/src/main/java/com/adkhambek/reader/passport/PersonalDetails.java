@@ -1,6 +1,8 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 package com.adkhambek.reader.passport;
 
+import androidx.annotation.NonNull;
+
 /** DG11 — additional personal details. Any field may be null. */
 public record PersonalDetails(
 		String fullName,
@@ -13,6 +15,7 @@ public record PersonalDetails(
 		String title
 ) {
 	// Redacted: toString() is what lands in logs. Only which fields are present.
+	@NonNull
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder("PersonalDetails[");

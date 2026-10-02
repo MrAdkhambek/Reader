@@ -208,8 +208,7 @@ public final class IdReaderActivity extends Activity implements NfcAdapter.Reade
 
 		final BitmapFactory.Options opts = new BitmapFactory.Options();
 		opts.inSampleSize = 1;
-		while (bounds.outWidth / (opts.inSampleSize * 2) >= 500
-				&& bounds.outHeight / (opts.inSampleSize * 2) >= 600) {
+		while (bounds.outWidth / (opts.inSampleSize * 2) >= 500 && bounds.outHeight / (opts.inSampleSize * 2) >= 600) {
 			opts.inSampleSize *= 2;
 		}
 		try {
