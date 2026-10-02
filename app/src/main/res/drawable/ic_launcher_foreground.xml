@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- NFC glyph (SVG Repo), scaled into the adaptive-icon safe zone: the 330-unit
+     square becomes 46dp centred in the 108dp canvas, so its corners stay inside
+     the 66dp safe circle under every launcher mask. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="0.13939"
+        android:scaleY="0.13939"
+        android:translateX="31"
+        android:translateY="31">
+        <path
+            android:fillColor="@color/ic_launcher_glyph"
+            android:pathData="M315,0H15C6.716,0,0,6.716,0,15v300c0,8.284,6.716,15,15,15h300c8.284,0,15,-6.716,15,-15V15C330,6.716,323.284,0,315,0z M300,300H30V30h270V300z" />
+        <path
+            android:fillColor="@color/ic_launcher_glyph"
+            android:pathData="M75,270h180c8.284,0,15,-6.716,15,-15V75c0,-8.284,-6.716,-15,-15,-15h-90c-8.284,0,-15,6.716,-15,15v47.58c-17.459,6.192,-30,22.865,-30,42.42c0,24.813,20.186,45,45,45s45,-20.187,45,-45c0,-19.555,-12.541,-36.227,-30,-42.42V90h60v150H90V90h5c8.284,0,15,-6.716,15,-15s-6.716,-15,-15,-15H75c-8.284,0,-15,6.716,-15,15v180C60,263.284,66.716,270,75,270z M165,180c-8.271,0,-15,-6.729,-15,-15s6.729,-15,15,-15s15,6.729,15,15S173.271,180,165,180z" />
+    </group>
+</vector>
