@@ -1,5 +1,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.card;
+package com.adkhambek.reader.card.iso7816;
+
+import androidx.annotation.RestrictTo;
 
 import java.io.IOException;
 
@@ -10,6 +12,7 @@ import java.io.IOException;
  * <p>Twin of the same file in the other NFC library (card ↔ passport) — keep
  * identical apart from the package line.
  */
-interface Transceiver {
+@RestrictTo(RestrictTo.Scope.LIBRARY)
+public interface Transceiver {
 	byte[] transceive(byte[] apdu) throws IOException;
 }

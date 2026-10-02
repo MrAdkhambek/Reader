@@ -6,6 +6,9 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
+import com.adkhambek.reader.card.iso7816.Replay;
+import com.adkhambek.reader.card.iso7816.Transceiver;
+
 import java.io.IOException;
 
 /** SYNTHETIC transcripts: a one-application Visa card built to the EMV structure. */

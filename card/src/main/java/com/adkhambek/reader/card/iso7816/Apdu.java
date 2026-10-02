@@ -1,5 +1,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.card;
+package com.adkhambek.reader.card.iso7816;
+
+import androidx.annotation.RestrictTo;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -13,18 +15,21 @@ import java.util.Arrays;
  * <p>Twin of the same file in the other NFC library (card ↔ passport) — keep
  * identical apart from the package line.
  */
-final class Apdu {
+@RestrictTo(RestrictTo.Scope.LIBRARY)
+public final class Apdu {
 	static final int SW_OK = 0x9000;
 	private static final int MAX_EXCHANGES = 16;
 	private static final byte[] ERROR = {0x6F, 0x00};
 
 	private final Transceiver transceiver;
 
-	Apdu(Transceiver transceiver) {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public Apdu(Transceiver transceiver) {
 		this.transceiver = transceiver;
 	}
 
-	byte[] send(byte[] command) throws IOException {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public byte[] send(byte[] command) throws IOException {
 		final ByteArrayOutputStream data = new ByteArrayOutputStream();
 		byte[] c = command.clone();
 		for (int i = 0; i < MAX_EXCHANGES; ++i) {
@@ -55,12 +60,14 @@ final class Apdu {
 		return ((response[n - 2] & 0xFF) << 8) | (response[n - 1] & 0xFF);
 	}
 
-	static boolean ok(byte[] response) {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static boolean ok(byte[] response) {
 		return sw(response) == SW_OK;
 	}
 
 	/** The response without its status word. */
-	static byte[] data(byte[] response) {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static byte[] data(byte[] response) {
 		return Arrays.copyOf(response, response.length - 2);
 	}
 }

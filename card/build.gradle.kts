@@ -7,7 +7,6 @@ android {
 }
 
 dependencies {
-    // @WorkerThread on the blocking read. CLASS retention: consumers do not
-    // need it on their compile classpath, so implementation is enough.
-    implementation(libs.androidx.annotation)
+    // api: @RestrictTo on the helper sub-packages must reach consumers' lint.
+    api(libs.androidx.annotation)
 }

@@ -1,11 +1,14 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.card;
+package com.adkhambek.reader.card.emv;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
+
+import com.adkhambek.reader.card.Currency;
+import com.adkhambek.reader.card.iso7816.Tlv;
 
 import java.util.List;
 

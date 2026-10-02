@@ -1,14 +1,18 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.card;
+package com.adkhambek.reader.card.iso7816;
 
-final class Bytes {
+import androidx.annotation.RestrictTo;
+
+@RestrictTo(RestrictTo.Scope.LIBRARY)
+public final class Bytes {
 	private static final char[] HEX = "0123456789ABCDEF".toCharArray();
 
 	private Bytes() {
 	}
 
 	/** Upper-case hex, two characters per byte. */
-	static String hex(byte[] b) {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static String hex(byte[] b) {
 		final char[] out = new char[b.length * 2];
 		for (int i = 0; i < b.length; ++i) {
 			out[2 * i] = HEX[(b[i] >> 4) & 0xF];

@@ -1,5 +1,13 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.card;
+package com.adkhambek.reader.card.emv;
+
+import androidx.annotation.RestrictTo;
+
+import com.adkhambek.reader.card.CardApp;
+import com.adkhambek.reader.card.Currency;
+import com.adkhambek.reader.card.iso7816.Apdu;
+import com.adkhambek.reader.card.iso7816.Bytes;
+import com.adkhambek.reader.card.iso7816.Tlv;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -10,14 +18,16 @@ import java.util.List;
 import java.util.Locale;
 
 /** EMV contactless read: PPSE → each AID → GPO → AFL records → {@link CardApp}. */
-final class Emv {
+@RestrictTo(RestrictTo.Scope.LIBRARY)
+public final class Emv {
 	private static final byte[] PPSE = "2PAY.SYS.DDF01".getBytes(StandardCharsets.US_ASCII);
 
 	private Emv() {
 	}
 
 	/** @return the card's payment applications, or null if the card has no PPSE */
-	static List<CardApp> read(Apdu apdu) throws IOException {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public static List<CardApp> read(Apdu apdu) throws IOException {
 		final byte[] ppse = apdu.send(select(PPSE));
 		if (!Apdu.ok(ppse)) return null;
 		final List<CardApp> apps = new ArrayList<>();
