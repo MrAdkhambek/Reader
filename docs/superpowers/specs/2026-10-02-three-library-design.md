@@ -28,7 +28,7 @@ An app adds only the libraries it uses, and pulls nothing from the others.
 |---|---|---|
 | D1 | Three artifacts, **no shared artifact**. Code both NFC libraries need is copied into each. | Author's call (option B). A shared `nfc-core` would avoid duplication, but would make four published artifacts. |
 | D2 | Each copy is a **compact helper** of about 150 lines, not the 354-line `Iso7816` class hierarchy | Keeps the cost of D1 small. Each library copies only what it calls. |
-| D3 | Copies live in `<library>.internal` packages | `passport` and `card` together in one app must not have duplicate classes. |
+| D3 | Copies are **package-private classes in each library's main package** (`…reader.card`, `…reader.passport`) | The different packages stop `passport` and `card` from clashing in one app, and package-private keeps the helpers out of the public API altogether. |
 | D4 | **Java only.** Blocking `read(...)` plus `read(..., Callback)` that runs on an `Executor` | Author's call. The previous plan's four `-ktx` modules are dropped. Kotlin apps can call the Java API directly. |
 | D5 | **One callback per call**, returning `Cancellable`. No observer registration. | Author's call. Nothing to unregister, so nothing can leak. |
 | D6 | One `ReadException` per library, with a `Reason` enum | Replaces a base class plus three subclasses, which would be eight files across two copies. |
@@ -52,14 +52,16 @@ All three are Android libraries (aar) built with the existing `read3r.android-li
 
 ### What each NFC library copies
 
-| Helper (in `.internal`) | `card` | `passport` |
+| Helper (package-private) | `card` | `passport` |
 |---|---|---|
 | `Apdu`: transceive with 61xx GET RESPONSE chaining, 6Cxx Le retry, and a 16-exchange cap | yes | yes |
 | `Tlv`: parse BER-TLV, flatten primitives, find first/all by tag | yes | yes |
-| `Tlv.encode` | — | yes |
 | `Bytes`: hex encode | yes | yes |
 | `Bytes`: concat, slice, xor, ISO 7816-4 pad/unpad, hex decode | — | yes |
 | `Transceiver`: `byte[] transceive(byte[])`, the test seam | yes | yes |
+| `Call`, `Callback`, `Cancellable`, `ReadException` | yes | yes |
+
+`Apdu`, `Tlv`, `Transceiver`, `Call`, `Callback`, `Cancellable` and `ReadException` are identical in both libraries apart from the package line. BER-TLV *encoding* is needed only by Secure Messaging, so it lives there rather than in `Tlv`, which keeps the twins identical.
 
 ## API
 
@@ -99,7 +101,7 @@ public interface Cancellable {
 - Argument errors (null tag, null key) are thrown synchronously from `read(...)`, as `IllegalArgumentException`. They are not delivered to the callback.
 
 **`cancel()`.**
-- Once it returns, the callback will not fire.
+- Called on the callback executor's thread (the main thread by default), the callback will not fire after it returns. Called from another thread, a delivery already running may still complete.
 - It closes the `IsoDep` connection, so a read in progress fails fast instead of running on for seconds.
 - It is idempotent, and does nothing after the callback has fired.
 
@@ -131,6 +133,7 @@ BAC failures inside `passport` are signalled internally by a `BacException`, whi
 
 ```java
 public record Card(String uid, List<CardApp> apps) { public boolean isUnknown(); }
+// A malformed EMV record is skipped; the card is still read from its other records.
 public record CardApp(byte[] aid, String label, String pan, String panSequence,
 		String cardholder, String country, Currency currency,
 		String effectiveDate, String expiryDate, String appVersion) { }
@@ -163,9 +166,14 @@ public final class Mrz {
 	public static boolean isValid(String mrz);                         // ICAO 9303 check digits
 	public static MrzDocument decode(String mrz) throws MrzFormatException;
 }
+public final class MrzFormatException extends IllegalArgumentException { }
 ```
 
-`Mrz`, `MrzDocument` and `MrzFormatException` are the uncommitted `mrz/` work in progress, moved into `passport` unchanged, so its 14-test `MrzTest` carries over as-is.
+`Mrz` ignores whitespace, so an MRZ scanned from a QR code with line breaks between its lines validates and decodes as is (this replaces the stripping `QrIdScannerView` did). `MrzFormatException` is unchecked: callers gate on `isValid` first.
+
+`MrzKey` validates at construction: the document number may contain only A–Z, 0–9 and `<` (lower case is upper-cased), and both dates must be six digits. Bad input throws `IllegalArgumentException` before any card I/O instead of failing mid-read.
+
+`Mrz`, `MrzDocument` and `MrzFormatException` come from the uncommitted `mrz/` work in progress, moved into `passport`, so its 14-test `MrzTest` carries over as-is. `MrzDocument`'s builder is package-private.
 
 ### QR
 
