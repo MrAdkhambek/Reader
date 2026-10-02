@@ -50,11 +50,9 @@ android {
 }
 
 dependencies {
-    // The published artifacts, not the in-repo modules: the sample exercises
-    // exactly what a consumer gets. Run ./gradlew publishToMavenLocal first.
-    implementation(libs.read3r.card)
-    implementation(libs.read3r.passport)
-    implementation(libs.read3r.qr)
+    implementation(project(":card"))
+    implementation(project(":passport"))
+    implementation(project(":qr"))
 
     // ComponentActivity = the minimum AndroidX dep needed for CameraX's LifecycleOwner.
     implementation(libs.androidx.activity)
