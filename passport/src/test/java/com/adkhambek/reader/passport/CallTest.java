@@ -108,4 +108,16 @@ public class CallTest {
 		assertEquals(1, cb.events.size());
 		assertFalse(connection.closed);
 	}
+
+	/** Review M2: an Error (e.g. StackOverflowError) is still delivered, exactly once, as FAILED. */
+	@Test public void wrapsErrorAsFailedAndDeliversOnce() {
+		final Recorder<String> cb = new Recorder<>();
+		Call.start(DIRECT, DIRECT, cb, null, () -> {
+			throw new StackOverflowError();
+		});
+		assertEquals(1, cb.events.size());
+		final ReadException e = (ReadException) cb.events.get(0);
+		assertEquals(ReadException.Reason.FAILED, e.reason());
+		assertTrue(e.getCause() instanceof StackOverflowError);
+	}
 }

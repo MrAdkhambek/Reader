@@ -49,7 +49,9 @@ final class Call<T> implements Cancellable, Runnable {
 			value = job.run();
 		} catch (ReadException e) {
 			error = e;
-		} catch (RuntimeException e) {
+		} catch (Throwable e) {
+			// Includes Errors (e.g. StackOverflowError from hostile nested BER),
+			// so the callback still fires exactly once.
 			error = new ReadException(ReadException.Reason.FAILED, e.toString(), e);
 		}
 		final T v = value;
