@@ -46,10 +46,18 @@ public record CardApp(
 
 	@Override
 	public String toString() {
+		// Redacted: toString() is what lands in logs. PAN shows its last 4 digits
+		// only; the cardholder name is left out entirely.
 		return "CardApp[aid=" + Arrays.toString(aid) + ", label=" + label
-				+ ", pan=" + pan + ", panSequence=" + panSequence
-				+ ", cardholder=" + cardholder + ", country=" + country
+				+ ", pan=" + maskPan(pan) + ", panSequence=" + panSequence
+				+ ", country=" + country
 				+ ", currency=" + currency + ", effectiveDate=" + effectiveDate
 				+ ", expiryDate=" + expiryDate + ", appVersion=" + appVersion + "]";
+	}
+
+	private static String maskPan(String pan) {
+		if (pan == null) return null;
+		final String digits = pan.replace(" ", "");
+		return "**** " + digits.substring(Math.max(0, digits.length() - 4));
 	}
 }
