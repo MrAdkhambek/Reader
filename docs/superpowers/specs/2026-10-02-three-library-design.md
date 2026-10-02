@@ -1,6 +1,6 @@
 # Read3r 3.0 — three libraries
 
-**Status:** approved design, 2026-10-02. Supersedes `2026-07-25-reader-api-redesign-design.md` and its plan `../plans/2026-07-25-reader-3.0-redesign.md`.
+**Status:** approved design, 2026-10-02. Supersedes the 2026-07-25 reader API redesign and its plan (removed; see git history).
 
 ## Goal
 

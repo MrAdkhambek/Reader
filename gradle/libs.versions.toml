@@ -37,8 +37,3 @@ junit = { module = "junit:junit", version.ref = "junit" }
 # Consumed only by build-logic/, so the convention plugins can apply these.
 android-gradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 mavenPublish-gradlePlugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "mavenPublish" }
-
-[plugins]
-android-application = { id = "com.android.application", version.ref = "agp" }
-android-library = { id = "com.android.library", version.ref = "agp" }
-maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
