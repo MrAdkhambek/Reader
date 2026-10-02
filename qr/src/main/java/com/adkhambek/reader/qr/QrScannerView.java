@@ -20,6 +20,9 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 
+import com.adkhambek.reader.qr.camera.QrScanner;
+import com.adkhambek.reader.qr.view.ScannerOverlayView;
+
 /**
  * Drop-in QR scanner: a CameraX preview under a {@link ScannerOverlayView}.
  * On a decode it snaps the reticle onto the code, holds, then calls back.

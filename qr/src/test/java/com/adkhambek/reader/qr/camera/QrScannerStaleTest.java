@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.qr;
+package com.adkhambek.reader.qr.camera;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

@@ -38,6 +38,8 @@ An app adds only the libraries it uses, and pulls nothing from the others.
 | D10 | The sample app stays in Java and is updated to the new API | The previous plan's Kotlin rewrite is dropped. |
 | D11 | Readers are instances; executors can be injected | Testable with a direct executor, and replaceable by a fake in app tests. |
 
+> **Amended 2026-10-02:** D3 is superseded by `2026-10-02-inner-packages-design.md` P1–P2. Helpers now live in function sub-packages, public with `@RestrictTo(LIBRARY)`.
+
 ## Artifacts
 
 All three are Android libraries (aar) built with the existing `read3r.android-library` convention plugin, and published through vanniktech with their own `gradle.properties` (`POM_ARTIFACT_ID`, `POM_NAME`, `POM_DESCRIPTION`).

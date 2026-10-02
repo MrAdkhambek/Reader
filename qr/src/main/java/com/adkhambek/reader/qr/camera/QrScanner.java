@@ -1,11 +1,12 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-package com.adkhambek.reader.qr;
+package com.adkhambek.reader.qr.camera;
 
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import androidx.annotation.RestrictTo;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.Preview;
@@ -16,6 +17,8 @@ import androidx.lifecycle.LifecycleOwner;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
+import com.adkhambek.reader.qr.QrCode;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -24,9 +27,11 @@ import java.util.concurrent.Executors;
  * analysis use case running {@link QrAnalyzer}. Everything except analysis
  * runs on the main thread, and results are posted there.
  */
-final class QrScanner {
+@RestrictTo(RestrictTo.Scope.LIBRARY)
+public final class QrScanner {
 
-	interface Sink {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public interface Sink {
 		void onCode(QrCode code);
 
 		void onError(Throwable t);
@@ -55,11 +60,13 @@ final class QrScanner {
 	private PreviewView previewView;
 	private LifecycleOwner lifecycle;
 
-	QrScanner(Context context) {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public QrScanner(Context context) {
 		this.context = context.getApplicationContext();
 	}
 
-	void start(PreviewView previewView, LifecycleOwner lifecycle, Sink sink) {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public void start(PreviewView previewView, LifecycleOwner lifecycle, Sink sink) {
 		this.previewView = previewView;
 		this.lifecycle = lifecycle;
 		this.sink = sink;
@@ -106,17 +113,20 @@ final class QrScanner {
 		return shutDown || gen != currentGen;
 	}
 
-	void stop() {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public void stop() {
 		++startGen;
 		if (provider != null) provider.unbindAll();
 	}
 
 	/** Re-arm the analyzer so the next frame can decode again. */
-	void resume() {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public void resume() {
 		if (analyzer != null) analyzer.reset();
 	}
 
-	void shutdown() {
+	@RestrictTo(RestrictTo.Scope.LIBRARY)
+	public void shutdown() {
 		shutDown = true;
 		previewView = null;
 		lifecycle = null;

@@ -28,6 +28,9 @@ dependencies {
     api(libs.camera.view)
     api(libs.lifecycle.common)
 
+    // api: @RestrictTo on the helper sub-packages must reach consumers' lint.
+    api(libs.androidx.annotation)
+
     // Internal only — QrCode carries float[]/int, never a ZXing type.
     implementation(libs.androidx.core)
     implementation(libs.zxing.core)

@@ -52,7 +52,7 @@ private void onTag(Tag tag) {
 }
 ```
 
-A passport needs the three MRZ fields printed on its data page:
+A passport needs the three MRZ fields printed on its data page. `MrzKey`, `Mrz`, `MrzDocument` and `MrzFormatException` live in `com.adkhambek.reader.passport.mrz`:
 
 ```java
 MrzKey key = new MrzKey("L898902C3", "690806", "940623");   // doc no., YYMMDD birth, YYMMDD expiry
